@@ -29,3 +29,55 @@ The application follows a client-server architecture:
 - **Recurring Expenses**: Set up expenses that repeat (e.g., monthly subscriptions) and track them automatically.
 - **Dashboard Charts**: Visualize spending patterns with charts using libraries like Chart.js.
 - **PDF Generation**: Export expense reports as PDF files for offline viewing or sharing." 
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           CLIENT SIDE (React Frontend)                        │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐                │
+│  │   Pages Layer   │  │ Component Layer │  │ Service Layer   │                │
+│  │                 │  │                 │  │                 │                │
+│  │ • Dashboard.jsx │  │ • ExpenseForm   │  │ • API Service   │                │
+│  │ • Login.jsx     │  │ • ExpenseTable  │  │ • Context       │                │
+│  │ • Register.jsx  │  │ • Charts        │  │ • Utils         │                │
+│  │ • Home.jsx      │  │ • Managers     │  │                 │                │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘                │
+│           │                       │                       │                  │
+│           └───────────────────────┼───────────────────────┘                  │
+│                                   │                                          │
+├───────────────────────────────────┼───────────────────────────────────────────┤
+│                                   │                                          │
+│                        HTTP/HTTPS API Requests (REST)                        │
+│                                   │                                          │
+│                                   ▼                                          │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                            SERVER SIDE (Node.js Backend)                      │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐                │
+│  │   Routes Layer  │  │ Controller Layer│  │  Middleware     │                │
+│  │                 │  │                 │  │                 │                │
+│  │ • authRoutes    │  │ • authController│  │ • authMiddleware│                │
+│  │ • expenseRoutes │  │ • expenseCtrl   │  │ • CORS          │                │
+│  │ • categoryRoutes│  │ • categoryCtrl  │  │ • Body Parser   │                │
+│  │ • budgetRoutes  │  │ • budgetCtrl    │  │                 │                │
+│  │ • recurringRoutes│ │ • recurringCtrl │  │                 │                │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘                │
+│           │                       │                       │                  │
+│           └───────────────────────┼───────────────────────┘                  │
+│                                   │                                          │
+├───────────────────────────────────┼───────────────────────────────────────────┤
+│                                   │                                          │
+│                         Business Logic & Data Processing                     │
+│                                   │                                          │
+│                                   ▼                                          │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                              DATA ACCESS LAYER                                │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐                │
+│  │   Model Layer   │  │ Database Config │  │   Database      │                │
+│  │                 │  │                 │  │                 │                │
+│  │ • userModel     │  │ • db.js         │  │ • MySQL         │                │
+│  │ • expenseModel  │  │ • Connection    │  │ • Tables        │                │
+│  │ • categoryModel │  │ • Pool          │  │ • Indexes       │                │
+│  │ • budgetModel   │  │                 │  │                 │                │
+│  │ • recurringModel│ │                 │  │                 │                │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘                │
+└─────────────────────────────────────────────────────────────────────────────────┘
