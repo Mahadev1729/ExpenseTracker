@@ -1,5 +1,7 @@
 ﻿import { useState } from "react";
-import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 import API from "../services/api";
 
 function ExpenseForm({ refresh }) {
@@ -15,10 +17,11 @@ function ExpenseForm({ refresh }) {
     transcript,
     listening,
     resetTranscript,
-    browserSupportsSpeechRecognition
+    browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
-  const startListening = () => SpeechRecognition.startListening({ continuous: true });
+  const startListening = () =>
+    SpeechRecognition.startListening({ continuous: true });
 
   const stopListening = () => SpeechRecognition.stopListening();
 
@@ -28,35 +31,59 @@ function ExpenseForm({ refresh }) {
     let category = "Others";
     let title = "";
 
-    const amountMatch = text.match(/\$?(\d+(?:\.\d{2})?)/);
+    const amountMatch = text.match(/\$?(\d+(?:\.\d{1,2})?)/);
     if (amountMatch) {
       amount = amountMatch[1];
     }
 
-    if (text.includes("food") || text.includes("groceries") || text.includes("dining")) {
-      category = "Food";
-    } else if (text.includes("travel") || text.includes("transport")) {
-      category = "Travel";
-    } else if (text.includes("shopping") || text.includes("clothes")) {
-      category = "Shopping";
-    } else if (text.includes("bills") || text.includes("utilities")) {
-      category = "Bills";
+    const categories = [
+      { keys: ["food", "groceries", "dining"], name: "Food" },
+      { keys: ["travel", "transport"], name: "Travel" },
+      { keys: ["shopping", "clothes"], name: "Shopping" },
+      { keys: ["bills", "utilities"], name: "Bills" },
+    ];
+
+    for (const c of categories) {
+      if (c.keys.some((k) => text.includes(k))) {
+        category = c.name;
+        break;
+      }
     }
 
-    const titleMatch = text.match(/(?:for|at)\s+(.+)/);
+    
+    const titleMatch = text.match(
+      /(?:for|at|on|about|regarding)\s+(.+?)(?:\s+(?:for|at|on|\$|\d)|$)/,
+    );
     if (titleMatch) {
       title = titleMatch[1].trim();
+    } else {
+      
+      let temp = text;
+      if (amountMatch) temp = temp.replace(amountMatch[0], "");
+      temp = temp.replace(
+        /\b(food|groceries|dining|travel|transport|shopping|clothes|bills|utilities)\b/g,
+        "",
+      );
+      temp = temp.replace(
+        /\b(spent|spent on|bought|purchase|purchased|paid|for|on|at|about|regarding)\b/g,
+        "",
+      );
+      temp = temp.replace(/[^a-z0-9\s]/g, "");
+      title = temp.trim();
+
+      
+      if (!title) title = transcript.trim();
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
 
-    setExpense({
-      ...expense,
-      title: title || expense.title,
-      amount: amount || expense.amount,
+    setExpense((prev) => ({
+      ...prev,
+      title: title || prev.title,
+      amount: amount || prev.amount,
       category,
       date: today,
-    });
+    }));
   };
 
   const submit = async (e) => {
@@ -133,7 +160,9 @@ function ExpenseForm({ refresh }) {
           onChange={(e) => setExpense({ ...expense, date: e.target.value })}
         />
 
-        <button className="bg-blue-500 text-white px-4 py-2">Add Expense</button>
+        <button className="bg-blue-500 text-white px-4 py-2">
+          Add Expense
+        </button>
       </form>
     </div>
   );
