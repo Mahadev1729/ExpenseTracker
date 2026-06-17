@@ -40,7 +40,7 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-  };
+   };
 
   const applyFilters = () => {
     let filtered = [...expenses];
