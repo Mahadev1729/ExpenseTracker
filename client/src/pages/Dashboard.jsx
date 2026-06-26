@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../services/api";
 
 import Navbar from "../components/Navbar";
@@ -9,6 +9,7 @@ import SummaryCards from "../components/SummaryCards";
 import CategoryManager from "../components/CategoryManager";
 import BudgetManager from "../components/BudgetManager";
 import RecurringExpenseManager from "../components/RecurringExpenseManager";
+import PacingAnalyzer from "../components/PacingAnalyzer";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
@@ -28,7 +29,8 @@ function Dashboard() {
     { id: "categories", label: "Categories", icon: "🏷️" },
     { id: "budgets", label: "Budgets", icon: "📊" },
     { id: "recurring", label: "Recurring", icon: "🔄" },
-    { id: "analytics", label: "Analytics", icon: "📈" }
+    { id: "analytics", label: "Analytics", icon: "📈" },
+    { id: "decision", label: "Decision Engine", icon: "⚖️" }
   ];
 
   const renderTabContent = () => {
@@ -49,6 +51,8 @@ function Dashboard() {
         return <RecurringExpenseManager />;
       case "analytics":
         return <DashboardCharts expenses={expenses} />;
+      case "decision":
+        return <PacingAnalyzer expenses={expenses} />;
       default:
         return null;
     }

@@ -1,6 +1,7 @@
-﻿import { useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/context";
+import NotificationInbox from "./NotificationInbox";
 
 function Navbar() {
   const { user, logout } = useContext(AuthContext);
@@ -22,13 +23,16 @@ function Navbar() {
           </div>
           <div className="flex items-center space-x-4">
             {user && (
-              <span className="text-white text-sm">
-                Welcome, {user.name}
-              </span>
+              <div className="flex items-center space-x-4">
+                <span className="text-white text-sm font-medium">
+                  Welcome, {user.name}
+                </span>
+                <NotificationInbox />
+              </div>
             )}
             <button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200"
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-200 shadow-sm"
             >
               Logout
             </button>

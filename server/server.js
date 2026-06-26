@@ -7,6 +7,11 @@ const expenseRoutes = require("./routes/expenseRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
 const recurringExpenseRoutes = require("./routes/recurringExpenseRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const notificationModel = require("./models/notificationModel");
+
+// Auto-initialize Notifications Table
+notificationModel.initialize();
 
 const app = express();
 
@@ -18,6 +23,7 @@ app.use("/api/expenses", expenseRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/recurring-expenses", recurringExpenseRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
