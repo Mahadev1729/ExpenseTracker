@@ -1,8 +1,14 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import API from "../services/api";
+import {
+  getPendingCount,
+  savePendingExpense,
+  clearPendingExpenses,
+  getPendingExpenses,
+} from "../utils/offlineStorage";
 
 function ExpenseForm({ refresh }) {
   const [categories, setCategories] = useState([]);
@@ -13,12 +19,10 @@ function ExpenseForm({ refresh }) {
     date: new Date().toISOString().split("T")[0],
     notes: "",
   });
+  const [offlineCount, setOfflineCount] = useState(getPendingCount());
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const response = await API.get("/categories");
       setCategories(response.data);
@@ -31,7 +35,44 @@ function ExpenseForm({ refresh }) {
     } catch (error) {
       console.error("Error fetching categories in ExpenseForm:", error);
     }
-  };
+  }, []);
+
+  const syncPendingExpenses = useCallback(async () => {
+    const pending = getPendingExpenses();
+    if (!pending.length || !navigator.onLine) return;
+
+    try {
+      for (const item of pending) {
+        await API.post("/expenses", item);
+      }
+      clearPendingExpenses();
+      setOfflineCount(0);
+      refresh();
+    } catch (error) {
+      console.error("Failed to sync pending expenses:", error);
+    }
+  }, [refresh]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    const handleStatusChange = () => {
+      setIsOnline(navigator.onLine);
+      if (navigator.onLine) {
+        syncPendingExpenses();
+      }
+    };
+
+    window.addEventListener("online", handleStatusChange);
+    window.addEventListener("offline", handleStatusChange);
+
+    return () => {
+      window.removeEventListener("online", handleStatusChange);
+      window.removeEventListener("offline", handleStatusChange);
+    };
+  }, [syncPendingExpenses]);
 
   const {
     transcript,
@@ -70,14 +111,12 @@ function ExpenseForm({ refresh }) {
       }
     }
 
-    
     const titleMatch = text.match(
       /(?:for|at|on|about|regarding)\s+(.+?)(?:\s+(?:for|at|on|\$|\d)|$)/,
     );
     if (titleMatch) {
       title = titleMatch[1].trim();
     } else {
-      
       let temp = text;
       if (amountMatch) temp = temp.replace(amountMatch[0], "");
       temp = temp.replace(
@@ -91,7 +130,6 @@ function ExpenseForm({ refresh }) {
       temp = temp.replace(/[^a-z0-9\s]/g, "");
       title = temp.trim();
 
-      
       if (!title) title = transcript.trim();
     }
 
@@ -108,8 +146,23 @@ function ExpenseForm({ refresh }) {
 
   const submit = async (e) => {
     e.preventDefault();
+    const payload = { ...expense };
+
     try {
-      await API.post("/expenses", expense);
+      if (!navigator.onLine) {
+        savePendingExpense(payload);
+        setOfflineCount(getPendingCount());
+        setExpense({
+          title: "",
+          amount: "",
+          category: categories[0]?.name || "",
+          date: new Date().toISOString().split("T")[0],
+          notes: "",
+        });
+        return;
+      }
+
+      await API.post("/expenses", payload);
       setExpense({
         title: "",
         amount: "",
@@ -120,6 +173,8 @@ function ExpenseForm({ refresh }) {
       refresh();
     } catch (error) {
       console.error("Error saving expense:", error);
+      savePendingExpense(payload);
+      setOfflineCount(getPendingCount());
     }
   };
 
@@ -152,6 +207,15 @@ function ExpenseForm({ refresh }) {
 
       <div className="mb-4">
         <p>Transcript: {transcript}</p>
+      </div>
+
+      <div className="mb-4 rounded border border-gray-200 bg-gray-50 p-2 text-sm">
+        <p>{isOnline ? "Online" : "Offline mode enabled"}</p>
+        <p>
+          {offlineCount > 0
+            ? `${offlineCount} pending expense(s) will sync when online.`
+            : "No pending expenses."}
+        </p>
       </div>
 
       <form onSubmit={submit}>
