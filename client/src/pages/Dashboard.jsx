@@ -14,12 +14,14 @@ import BudgetManager from "../components/BudgetManager";
 import RecurringExpenseManager from "../components/RecurringExpenseManager";
 import PacingAnalyzer from "../components/PacingAnalyzer";
 import AIFinancialCopilot from "../components/AIFinancialCopilot";
+import { ShimmerDashboard } from "../components/Shimmer";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState("expenses");
   const [budgetProgress, setBudgetProgress] = useState([]);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { refresh: refreshNotifications } = useContext(NotificationContext);
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -39,11 +41,18 @@ function Dashboard() {
   }, []);
 
   const loadExpenses = useCallback(async () => {
-    const res = await API.get("/expenses");
-    setExpenses(res.data);
-    loadBudgetProgress();
-    if (refreshNotifications) {
-      refreshNotifications();
+    try {
+      setIsLoading(true);
+      const res = await API.get("/expenses");
+      setExpenses(res.data);
+      loadBudgetProgress();
+      if (refreshNotifications) {
+        refreshNotifications();
+      }
+    } catch (error) {
+      console.error("Error loading expenses:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [refreshNotifications, loadBudgetProgress]);
 
@@ -61,19 +70,28 @@ function Dashboard() {
   ];
 
   const renderTabContent = () => {
+    if (isLoading && activeTab === "expenses") {
+      return <ShimmerDashboard />;
+    }
+
     switch (activeTab) {
       case "expenses":
         return (
           <div className="space-y-6">
-            <SummaryCards expenses={expenses} />
+            <SummaryCards expenses={expenses} isLoading={isLoading} />
             <AIFinancialCopilot
               expenses={expenses}
               budgetProgress={budgetProgress}
+              isLoading={isLoading}
             />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
-                <ExpenseForm refresh={loadExpenses} />
-                <ExpenseTable expenses={expenses} refresh={loadExpenses} />
+                <ExpenseForm refresh={loadExpenses} isLoading={isLoading} />
+                <ExpenseTable
+                  expenses={expenses}
+                  refresh={loadExpenses}
+                  isLoading={isLoading}
+                />
               </div>
               <div className="space-y-6">
                 <div className="premium-card p-6">
@@ -138,9 +156,9 @@ function Dashboard() {
       case "recurring":
         return <RecurringExpenseManager />;
       case "analytics":
-        return <DashboardCharts expenses={expenses} />;
+        return <DashboardCharts expenses={expenses} isLoading={isLoading} />;
       case "decision":
-        return <PacingAnalyzer expenses={expenses} />;
+        return <PacingAnalyzer expenses={expenses} isLoading={isLoading} />;
       default:
         return null;
     }

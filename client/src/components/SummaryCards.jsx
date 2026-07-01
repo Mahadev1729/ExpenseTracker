@@ -1,4 +1,10 @@
-﻿function SummaryCards({ expenses }) {
+﻿import { ShimmerSummaryCards } from "./Shimmer";
+
+function SummaryCards({ expenses, isLoading = false }) {
+  if (isLoading) {
+    return <ShimmerSummaryCards />;
+  }
+
   const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
   return (

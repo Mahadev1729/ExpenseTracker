@@ -1,25 +1,35 @@
 ﻿import { useState, useEffect } from "react";
 import API from "../services/api";
+import { ShimmerList } from "./Shimmer";
 
 function RecurringExpenseManager() {
   const [recurringExpenses, setRecurringExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
     category: "",
     frequency: "monthly",
-    start_date: new Date().toISOString().split('T')[0],
+    start_date: new Date().toISOString().split("T")[0],
     end_date: "",
-    notes: ""
+    notes: "",
   });
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
-    fetchRecurringExpenses();
-    fetchCategories();
+    loadAllData();
   }, []);
+
+  const loadAllData = async () => {
+    try {
+      setIsLoading(true);
+      await Promise.all([fetchRecurringExpenses(), fetchCategories()]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const fetchRecurringExpenses = async () => {
     try {
@@ -39,6 +49,10 @@ function RecurringExpenseManager() {
     }
   };
 
+  if (isLoading) {
+    return <ShimmerList items={5} />;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -54,9 +68,9 @@ function RecurringExpenseManager() {
         amount: "",
         category: "",
         frequency: "monthly",
-        start_date: new Date().toISOString().split('T')[0],
+        start_date: new Date().toISOString().split("T")[0],
         end_date: "",
-        notes: ""
+        notes: "",
       });
       setEditingId(null);
     } catch (error) {
@@ -72,14 +86,16 @@ function RecurringExpenseManager() {
       frequency: expense.frequency,
       start_date: expense.start_date,
       end_date: expense.end_date || "",
-      notes: expense.notes || ""
+      notes: expense.notes || "",
     });
     setEditingId(expense.id);
     setShowForm(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this recurring expense?")) {
+    if (
+      window.confirm("Are you sure you want to delete this recurring expense?")
+    ) {
       try {
         await API.delete(`/recurring-expenses/${id}`);
         fetchRecurringExpenses();
@@ -132,34 +148,49 @@ function RecurringExpenseManager() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <form
+          onSubmit={handleSubmit}
+          className="mb-6 p-4 bg-gray-50 rounded-lg"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Title
+              </label>
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Amount
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
@@ -172,10 +203,14 @@ function RecurringExpenseManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Frequency</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Frequency
+              </label>
               <select
                 value={formData.frequency}
-                onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, frequency: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="daily">Daily</option>
@@ -185,30 +220,42 @@ function RecurringExpenseManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Start Date
+              </label>
               <input
                 type="date"
                 value={formData.start_date}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, start_date: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Date (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                End Date (Optional)
+              </label>
               <input
                 type="date"
                 value={formData.end_date}
-                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, end_date: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Notes
+            </label>
             <textarea
               value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, notes: e.target.value })
+              }
               className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows="3"
             ></textarea>
@@ -229,9 +276,9 @@ function RecurringExpenseManager() {
                   amount: "",
                   category: "",
                   frequency: "monthly",
-                  start_date: new Date().toISOString().split('T')[0],
+                  start_date: new Date().toISOString().split("T")[0],
                   end_date: "",
-                  notes: ""
+                  notes: "",
                 });
                 setEditingId(null);
               }}
@@ -245,11 +292,16 @@ function RecurringExpenseManager() {
 
       <div className="space-y-4">
         {recurringExpenses.map((expense) => (
-          <div key={expense.id} className="border border-gray-200 p-4 rounded-lg">
+          <div
+            key={expense.id}
+            className="border border-gray-200 p-4 rounded-lg"
+          >
             <div className="flex justify-between items-start mb-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-800 text-lg">{expense.title}</span>
+                  <span className="font-medium text-gray-800 text-lg">
+                    {expense.title}
+                  </span>
                   <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded capitalize">
                     {expense.frequency}
                   </span>
@@ -258,7 +310,9 @@ function RecurringExpenseManager() {
                   ${expense.amount} • {expense.category}
                 </div>
                 {expense.notes && (
-                  <div className="text-sm text-gray-500 mt-1">{expense.notes}</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {expense.notes}
+                  </div>
                 )}
               </div>
               <div className="flex gap-2 ml-4">
@@ -278,10 +332,15 @@ function RecurringExpenseManager() {
             </div>
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>Started: {expense.start_date}</span>
-              <span className={`font-medium ${
-                getNextDueDate(expense) === "Overdue" ? "text-red-600" :
-                getNextDueDate(expense) === "Due today" ? "text-orange-600" : "text-green-600"
-              }`}>
+              <span
+                className={`font-medium ${
+                  getNextDueDate(expense) === "Overdue"
+                    ? "text-red-600"
+                    : getNextDueDate(expense) === "Due today"
+                      ? "text-orange-600"
+                      : "text-green-600"
+                }`}
+              >
                 {getNextDueDate(expense)}
               </span>
             </div>

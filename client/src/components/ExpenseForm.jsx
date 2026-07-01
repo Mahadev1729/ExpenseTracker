@@ -9,8 +9,12 @@ import {
   clearPendingExpenses,
   getPendingExpenses,
 } from "../utils/offlineStorage";
+import { ShimmerExpenseForm } from "./Shimmer";
 
-function ExpenseForm({ refresh }) {
+function ExpenseForm({ refresh, isLoading = false }) {
+  if (isLoading) {
+    return <ShimmerExpenseForm />;
+  }
   const [categories, setCategories] = useState([]);
   const [expense, setExpense] = useState({
     title: "",

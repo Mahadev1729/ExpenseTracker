@@ -12,6 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import API from "../services/api";
+import { ShimmerChart } from "./Shimmer";
 
 ChartJS.register(
   BarElement,
@@ -24,19 +25,30 @@ ChartJS.register(
   Legend,
 );
 
-function DashboardCharts({ expenses }) {
+function DashboardCharts({ expenses, isLoading = false }) {
   const [expenseStats, setExpenseStats] = useState([]);
   const [dateRangeData, setDateRangeData] = useState([]);
   const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
-    fetchExpenseStats();
-    fetchDateRangeData();
+    loadChartData();
   }, [selectedPeriod]);
+
+  const loadChartData = async () => {
+    try {
+      setStatsLoading(true);
+      await Promise.all([fetchExpenseStats(), fetchDateRangeData()]);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   const fetchExpenseStats = async () => {
     try {
-      const response = await API.get(`/expenses/stats?period=${selectedPeriod}`);
+      const response = await API.get(
+        `/expenses/stats?period=${selectedPeriod}`,
+      );
       setExpenseStats(response.data);
     } catch (error) {
       console.error("Error fetching expense stats:", error);
@@ -45,17 +57,28 @@ function DashboardCharts({ expenses }) {
 
   const fetchDateRangeData = async () => {
     try {
-      const endDate = new Date().toISOString().split('T')[0];
+      const endDate = new Date().toISOString().split("T")[0];
       const startDate = new Date();
       startDate.setMonth(startDate.getMonth() - 6);
-      const startDateStr = startDate.toISOString().split('T')[0];
+      const startDateStr = startDate.toISOString().split("T")[0];
 
-      const response = await API.get(`/expenses/date-range?startDate=${startDateStr}&endDate=${endDate}`);
+      const response = await API.get(
+        `/expenses/date-range?startDate=${startDateStr}&endDate=${endDate}`,
+      );
       setDateRangeData(response.data);
     } catch (error) {
       console.error("Error fetching date range data:", error);
     }
   };
+
+  if (isLoading || statsLoading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ShimmerChart />
+        <ShimmerChart />
+      </div>
+    );
+  }
 
   const categories = {};
   expenses.forEach((e) => {
@@ -88,7 +111,9 @@ function DashboardCharts({ expenses }) {
     .slice(0, 10);
 
   const barData = {
-    labels: topExpenses.map((e) => e.title.length > 20 ? e.title.substring(0, 20) + "..." : e.title),
+    labels: topExpenses.map((e) =>
+      e.title.length > 20 ? e.title.substring(0, 20) + "..." : e.title,
+    ),
     datasets: [
       {
         label: "Amount ($)",
@@ -101,11 +126,11 @@ function DashboardCharts({ expenses }) {
   };
 
   const trendData = {
-    labels: dateRangeData.map(d => d.date),
+    labels: dateRangeData.map((d) => d.date),
     datasets: [
       {
         label: "Daily Total ($)",
-        data: dateRangeData.map(d => d.total_amount),
+        data: dateRangeData.map((d) => d.total_amount),
         borderColor: "#10b981",
         backgroundColor: "rgba(16, 185, 129, 0.1)",
         tension: 0.4,
@@ -113,21 +138,21 @@ function DashboardCharts({ expenses }) {
       },
       {
         label: "Expense Count",
-        data: dateRangeData.map(d => d.expense_count),
+        data: dateRangeData.map((d) => d.expense_count),
         borderColor: "#f59e0b",
         backgroundColor: "rgba(245, 158, 11, 0.1)",
         tension: 0.4,
-        yAxisID: 'y1',
+        yAxisID: "y1",
       },
     ],
   };
 
   const categoryStatsData = {
-    labels: expenseStats.map(stat => stat.category),
+    labels: expenseStats.map((stat) => stat.category),
     datasets: [
       {
         label: "Total Amount ($)",
-        data: expenseStats.map(stat => stat.total_amount),
+        data: expenseStats.map((stat) => stat.total_amount),
         backgroundColor: "#8b5cf6",
         borderColor: "#7c3aed",
         borderWidth: 1,
@@ -139,46 +164,46 @@ function DashboardCharts({ expenses }) {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
       tooltip: {
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             return `${context.dataset.label}: $${context.parsed.y}`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
   };
 
   const trendOptions = {
     responsive: true,
     interaction: {
-      mode: 'index',
+      mode: "index",
       intersect: false,
     },
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
     },
     scales: {
       y: {
-        type: 'linear',
+        type: "linear",
         display: true,
-        position: 'left',
+        position: "left",
         title: {
           display: true,
-          text: 'Amount ($)'
-        }
+          text: "Amount ($)",
+        },
       },
       y1: {
-        type: 'linear',
+        type: "linear",
         display: true,
-        position: 'right',
+        position: "right",
         title: {
           display: true,
-          text: 'Count'
+          text: "Count",
         },
         grid: {
           drawOnChartArea: false,
@@ -190,7 +215,9 @@ function DashboardCharts({ expenses }) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">Analytics Dashboard</h2>
+        <h2 className="text-2xl font-bold text-gray-800">
+          Analytics Dashboard
+        </h2>
         <select
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
@@ -205,34 +232,46 @@ function DashboardCharts({ expenses }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Expense Distribution by Category</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Expense Distribution by Category
+          </h3>
           <Pie data={pieData} options={chartOptions} />
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Top 10 Expenses</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Top 10 Expenses
+          </h3>
           <Bar data={barData} options={chartOptions} />
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Expense Trends (Last 6 Months)</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Expense Trends (Last 6 Months)
+        </h3>
         <Line data={trendData} options={trendOptions} />
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Category Statistics ({selectedPeriod})</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Category Statistics ({selectedPeriod})
+        </h3>
         <Bar data={categoryStatsData} options={chartOptions} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {expenseStats.slice(0, 3).map((stat, index) => (
           <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">{stat.category}</h4>
+            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+              {stat.category}
+            </h4>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Total:</span>
-                <span className="font-bold text-green-600">${stat.total_amount}</span>
+                <span className="font-bold text-green-600">
+                  ${stat.total_amount}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Average:</span>

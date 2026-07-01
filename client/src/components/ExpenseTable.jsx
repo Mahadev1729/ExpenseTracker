@@ -1,8 +1,16 @@
 ﻿import { useState, useEffect } from "react";
 import API from "../services/api";
 import { generateExpensePDF } from "../utils/pdfGenerator";
+import { ShimmerTable } from "./Shimmer";
 
-function ExpenseTable({ expenses: initialExpenses, refresh }) {
+function ExpenseTable({
+  expenses: initialExpenses,
+  refresh,
+  isLoading = false,
+}) {
+  if (isLoading) {
+    return <ShimmerTable rows={8} columns={5} />;
+  }
   const [expenses, setExpenses] = useState(initialExpenses);
   const [filteredExpenses, setFilteredExpenses] = useState(initialExpenses);
   const [categories, setCategories] = useState([]);
@@ -12,11 +20,11 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
     startDate: "",
     endDate: "",
     minAmount: "",
-    maxAmount: ""
+    maxAmount: "",
   });
   const [sortConfig, setSortConfig] = useState({
     key: "date",
-    direction: "desc"
+    direction: "desc",
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -40,36 +48,48 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
-   };
+  };
 
   const applyFilters = () => {
     let filtered = [...expenses];
 
     if (filters.search) {
-      filtered = filtered.filter(expense =>
-        expense.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        (expense.notes && expense.notes.toLowerCase().includes(filters.search.toLowerCase()))
+      filtered = filtered.filter(
+        (expense) =>
+          expense.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+          (expense.notes &&
+            expense.notes.toLowerCase().includes(filters.search.toLowerCase())),
       );
     }
 
     if (filters.category) {
-      filtered = filtered.filter(expense => expense.category === filters.category);
+      filtered = filtered.filter(
+        (expense) => expense.category === filters.category,
+      );
     }
 
     if (filters.startDate) {
-      filtered = filtered.filter(expense => expense.date >= filters.startDate);
+      filtered = filtered.filter(
+        (expense) => expense.date >= filters.startDate,
+      );
     }
 
     if (filters.endDate) {
-      filtered = filtered.filter(expense => expense.date <= filters.endDate);
+      filtered = filtered.filter((expense) => expense.date <= filters.endDate);
     }
 
     if (filters.minAmount) {
-      filtered = filtered.filter(expense => parseFloat(expense.amount) >= parseFloat(filters.minAmount));
+      filtered = filtered.filter(
+        (expense) =>
+          parseFloat(expense.amount) >= parseFloat(filters.minAmount),
+      );
     }
 
     if (filters.maxAmount) {
-      filtered = filtered.filter(expense => parseFloat(expense.amount) <= parseFloat(filters.maxAmount));
+      filtered = filtered.filter(
+        (expense) =>
+          parseFloat(expense.amount) <= parseFloat(filters.maxAmount),
+      );
     }
 
     filtered.sort((a, b) => {
@@ -95,21 +115,24 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
 
   const exportData = async (format) => {
     try {
-      if (format === 'pdf') {
+      if (format === "pdf") {
         generateExpensePDF(filteredExpenses, categories);
         return;
       }
 
-      const response = await API.get(`/expenses/export?format=${format}&${new URLSearchParams(filters).toString()}`, {
-        responseType: format === 'json' ? 'json' : 'blob'
-      });
+      const response = await API.get(
+        `/expenses/export?format=${format}&${new URLSearchParams(filters).toString()}`,
+        {
+          responseType: format === "json" ? "json" : "blob",
+        },
+      );
 
-      if (format === 'json') {
+      if (format === "json") {
         const dataStr = JSON.stringify(response.data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        downloadBlob(dataBlob, 'expenses.json');
+        const dataBlob = new Blob([dataStr], { type: "application/json" });
+        downloadBlob(dataBlob, "expenses.json");
       } else {
-        downloadBlob(response.data, 'expenses.csv');
+        downloadBlob(response.data, "expenses.csv");
       }
     } catch (error) {
       console.error("Error exporting data:", error);
@@ -118,7 +141,7 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
 
   const downloadBlob = (blob, filename) => {
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = filename;
     document.body.appendChild(link);
@@ -145,7 +168,7 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
       startDate: "",
       endDate: "",
       minAmount: "",
-      maxAmount: ""
+      maxAmount: "",
     });
   };
 
@@ -171,7 +194,9 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
               className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-200"
               defaultValue=""
             >
-              <option value="" disabled>Export</option>
+              <option value="" disabled>
+                Export
+              </option>
               <option value="pdf">📄 Export PDF</option>
               <option value="csv">📊 Export CSV</option>
               <option value="json">💾 Export JSON</option>
@@ -184,20 +209,28 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
         <div className="mb-6 p-4 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Search
+              </label>
               <input
                 type="text"
                 placeholder="Search title or notes..."
                 value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
               <select
                 value={filters.category}
-                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, category: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Categories</option>
@@ -209,40 +242,56 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Amount</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Min Amount
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={filters.minAmount}
-                onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, minAmount: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Amount</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Max Amount
+              </label>
               <input
                 type="number"
                 step="0.01"
                 value={filters.maxAmount}
-                onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, maxAmount: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Start Date
+              </label>
               <input
                 type="date"
                 value={filters.startDate}
-                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, startDate: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                End Date
+              </label>
               <input
                 type="date"
                 value={filters.endDate}
-                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, endDate: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -293,7 +342,9 @@ function ExpenseTable({ expenses: initialExpenses, refresh }) {
                 <td className="p-3">
                   <div>
                     <div className="font-medium text-gray-800">{e.title}</div>
-                    {e.notes && <div className="text-sm text-gray-500">{e.notes}</div>}
+                    {e.notes && (
+                      <div className="text-sm text-gray-500">{e.notes}</div>
+                    )}
                   </div>
                 </td>
                 <td className="p-3 font-medium text-green-600">${e.amount}</td>

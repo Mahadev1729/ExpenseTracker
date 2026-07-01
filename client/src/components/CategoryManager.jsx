@@ -1,13 +1,15 @@
 ﻿import { useState, useEffect } from "react";
 import API from "../services/api";
+import { ShimmerList } from "./Shimmer";
 
 function CategoryManager() {
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     color: "#3B82F6",
-    icon: "📊"
+    icon: "📊",
   });
   const [editingId, setEditingId] = useState(null);
 
@@ -17,12 +19,19 @@ function CategoryManager() {
 
   const fetchCategories = async () => {
     try {
+      setIsLoading(true);
       const response = await API.get("/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <ShimmerList items={5} />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +54,7 @@ function CategoryManager() {
     setFormData({
       name: category.name,
       color: category.color,
-      icon: category.icon
+      icon: category.icon,
     });
     setEditingId(category.id);
     setShowForm(true);
@@ -61,10 +70,9 @@ function CategoryManager() {
       }
     }
   };
-  
 
-  const defaultCategories = categories.filter(cat => !cat.user_id);
-  const customCategories = categories.filter(cat => cat.user_id);
+  const defaultCategories = categories.filter((cat) => !cat.user_id);
+  const customCategories = categories.filter((cat) => cat.user_id);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -79,33 +87,48 @@ function CategoryManager() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <form
+          onSubmit={handleSubmit}
+          className="mb-6 p-4 bg-gray-50 rounded-lg"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Name
+              </label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Color
+              </label>
               <input
                 type="color"
                 value={formData.color}
-                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, color: e.target.value })
+                }
                 className="w-full h-10 border border-gray-300 rounded-md cursor-pointer"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Icon
+              </label>
               <input
                 type="text"
                 value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, icon: e.target.value })
+                }
                 className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="📊"
               />
@@ -136,14 +159,21 @@ function CategoryManager() {
       <div className="space-y-6">
         {customCategories.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Your Categories</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">
+              Your Categories
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {customCategories.map((category) => (
-                <div key={category.id} className="border border-gray-200 p-4 rounded-lg flex items-center justify-between">
+                <div
+                  key={category.id}
+                  className="border border-gray-200 p-4 rounded-lg flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{category.icon}</span>
                     <div>
-                      <span className="font-medium text-gray-800">{category.name}</span>
+                      <span className="font-medium text-gray-800">
+                        {category.name}
+                      </span>
                       <div
                         className="w-4 h-4 rounded-full mt-1"
                         style={{ backgroundColor: category.color }}
@@ -171,13 +201,20 @@ function CategoryManager() {
         )}
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">Default Categories</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            Default Categories
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {defaultCategories.map((category) => (
-              <div key={category.id} className="border border-gray-200 p-4 rounded-lg flex items-center gap-3 opacity-75">
+              <div
+                key={category.id}
+                className="border border-gray-200 p-4 rounded-lg flex items-center gap-3 opacity-75"
+              >
                 <span className="text-2xl">{category.icon}</span>
                 <div>
-                  <span className="font-medium text-gray-800">{category.name}</span>
+                  <span className="font-medium text-gray-800">
+                    {category.name}
+                  </span>
                   <div
                     className="w-4 h-4 rounded-full mt-1"
                     style={{ backgroundColor: category.color }}

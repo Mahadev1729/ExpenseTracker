@@ -1,4 +1,14 @@
-﻿function AIFinancialCopilot({ expenses = [], budgetProgress = [] }) {
+﻿import { ShimmerCard } from "./Shimmer";
+
+function AIFinancialCopilot({
+  expenses = [],
+  budgetProgress = [],
+  isLoading = false,
+}) {
+  if (isLoading) {
+    return <ShimmerCard />;
+  }
+
   const monthStart = new Date();
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
