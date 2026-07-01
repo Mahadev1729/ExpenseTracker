@@ -15,11 +15,12 @@ exports.getNotifications = async (req, res) => {
                 const percent = (spent / total) * 100;
                 if (percent >= 85) {
                     const status = percent >= 100 ? "exceeded" : "approaching limit";
+                    const categoryName = budget.category_name || "All Categories";
                     await notificationModel.addNotification({
                         user_id: userId,
                         type: "budget",
-                        title: `Budget Warning: ${budget.category_name}`,
-                        message: `Spent $${spent.toFixed(2)} of $${total.toFixed(2)} budget for ${budget.category_name} (${percent.toFixed(1)}%). Status: ${status}.`
+                        title: `Budget Warning: ${categoryName}`,
+                        message: `Spent $${spent.toFixed(2)} of $${total.toFixed(2)} budget for ${categoryName} (${percent.toFixed(1)}%). Status: ${status}.`
                     });
                 }
             }

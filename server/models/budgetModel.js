@@ -1,4 +1,4 @@
-﻿const db = require("../config/db");
+const db = require("../config/db");
 
 exports.getBudgetsByUser = async (userId) => {
     const connection = await db;
@@ -51,7 +51,8 @@ exports.getBudgetProgress = async (userId, categoryId = null) => {
                (COALESCE(SUM(e.amount), 0) / b.amount) * 100 as progress_percentage
         FROM budgets b
         LEFT JOIN categories c ON b.category_id = c.id
-        LEFT JOIN expenses e ON e.category = c.name AND e.user_id = b.user_id
+        LEFT JOIN expenses e ON e.user_id = b.user_id
+        AND (b.category_id IS NULL OR e.category = c.name)
         AND e.date BETWEEN b.start_date AND b.end_date
         WHERE b.user_id = ?
     `;

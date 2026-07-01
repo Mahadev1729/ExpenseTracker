@@ -1,17 +1,37 @@
-﻿import { useState } from "react";
+import { useState, useEffect } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import API from "../services/api";
 
 function ExpenseForm({ refresh }) {
+  const [categories, setCategories] = useState([]);
   const [expense, setExpense] = useState({
     title: "",
     amount: "",
-    category: "Food",
-    date: "",
+    category: "",
+    date: new Date().toISOString().split("T")[0],
     notes: "",
   });
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await API.get("/categories");
+      setCategories(response.data);
+      if (response.data.length > 0) {
+        setExpense((prev) => ({
+          ...prev,
+          category: response.data[0].name,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching categories in ExpenseForm:", error);
+    }
+  };
 
   const {
     transcript,
@@ -88,10 +108,19 @@ function ExpenseForm({ refresh }) {
 
   const submit = async (e) => {
     e.preventDefault();
-
-    await API.post("/expenses", expense);
-
-    refresh();
+    try {
+      await API.post("/expenses", expense);
+      setExpense({
+        title: "",
+        amount: "",
+        category: categories[0]?.name || "",
+        date: new Date().toISOString().split("T")[0],
+        notes: "",
+      });
+      refresh();
+    } catch (error) {
+      console.error("Error saving expense:", error);
+    }
   };
 
   if (!browserSupportsSpeechRecognition) {
@@ -146,11 +175,11 @@ function ExpenseForm({ refresh }) {
           value={expense.category}
           onChange={(e) => setExpense({ ...expense, category: e.target.value })}
         >
-          <option>Food</option>
-          <option>Travel</option>
-          <option>Shopping</option>
-          <option>Bills</option>
-          <option>Others</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.icon} {c.name}
+            </option>
+          ))}
         </select>
 
         <input

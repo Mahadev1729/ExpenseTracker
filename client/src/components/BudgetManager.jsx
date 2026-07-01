@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
 
 function BudgetManager() {
@@ -49,28 +49,34 @@ function BudgetManager() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingId) {
-        await API.put(`/budgets/${editingId}`, formData);
-      } else {
-        await API.post("/budgets", formData);
-      }
-      fetchBudgets();
-      fetchBudgetProgress();
-      setShowForm(false);
-      setFormData({
-        category_id: "",
-        amount: "",
-        period: "monthly",
-        start_date: new Date().toISOString().split('T')[0],
-        end_date: ""
-      });
-      setEditingId(null);
-    } catch (error) {
-      console.error("Error saving budget:", error);
+  e.preventDefault();
+  // Convert empty category_id to null to avoid DB error
+  const payload = { ...formData };
+  if (!payload.category_id) {
+    payload.category_id = null;
+  }
+  try {
+    if (editingId) {
+      await API.put(`/budgets/${editingId}`, payload);
+    } else {
+      await API.post("/budgets", payload);
     }
-  };
+    // Refresh data and reset form
+    fetchBudgets();
+    fetchBudgetProgress();
+    setShowForm(false);
+    setFormData({
+      category_id: "",
+      amount: "",
+      period: "monthly",
+      start_date: new Date().toISOString().split('T')[0],
+      end_date: ""
+    });
+    setEditingId(null);
+  } catch (error) {
+    console.error("Error saving budget:", error);
+  }
+};
 
   const handleEdit = (budget) => {
     setFormData({

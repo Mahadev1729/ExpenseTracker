@@ -1,4 +1,4 @@
-﻿const budgetModel = require("../models/budgetModel");
+const budgetModel = require("../models/budgetModel");
 
 exports.getBudgets = async (req, res) => {
     try {
@@ -27,6 +27,13 @@ exports.addBudget = async (req, res) => {
     try {
         const userId = req.user.id;
         const budgetData = { ...req.body, user_id: userId };
+        // Convert empty category_id and end_date to null to avoid MySQL database formatting errors
+        if (!budgetData.category_id) {
+            budgetData.category_id = null;
+        }
+        if (!budgetData.end_date) {
+            budgetData.end_date = null;
+        }
 
         await budgetModel.addBudget(budgetData);
         res.json({ message: "Budget added successfully" });
@@ -39,7 +46,14 @@ exports.addBudget = async (req, res) => {
 exports.updateBudget = async (req, res) => {
     try {
         const { id } = req.params;
-        const budgetData = req.body;
+        const budgetData = { ...req.body };
+        // Convert empty category_id and end_date to null to avoid MySQL database formatting errors
+        if (!budgetData.category_id) {
+            budgetData.category_id = null;
+        }
+        if (!budgetData.end_date) {
+            budgetData.end_date = null;
+        }
 
         await budgetModel.updateBudget(id, budgetData);
         res.json({ message: "Budget updated successfully" });
