@@ -13,6 +13,7 @@ import CategoryManager from "../components/CategoryManager";
 import BudgetManager from "../components/BudgetManager";
 import RecurringExpenseManager from "../components/RecurringExpenseManager";
 import PacingAnalyzer from "../components/PacingAnalyzer";
+import AIFinancialCopilot from "../components/AIFinancialCopilot";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
@@ -56,7 +57,7 @@ function Dashboard() {
     { id: "budgets", label: "Budgets", icon: "📊" },
     { id: "recurring", label: "Recurring", icon: "🔄" },
     { id: "analytics", label: "Analytics", icon: "📈" },
-    { id: "decision", label: "Decision Engine", icon: "⚖️" }
+    { id: "decision", label: "Decision Engine", icon: "⚖️" },
   ];
 
   const renderTabContent = () => {
@@ -65,19 +66,24 @@ function Dashboard() {
         return (
           <div className="space-y-6">
             <SummaryCards expenses={expenses} />
+            <AIFinancialCopilot
+              expenses={expenses}
+              budgetProgress={budgetProgress}
+            />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <ExpenseForm refresh={loadExpenses} />
                 <ExpenseTable expenses={expenses} refresh={loadExpenses} />
               </div>
               <div className="space-y-6">
-                <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <div className="premium-card p-6">
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                     <span>📊</span> Live Budget Progress
                   </h3>
                   {budgetProgress.length === 0 ? (
-                    <div className="text-gray-500 text-sm py-4 text-center">
-                      No active budgets set. Go to the "Budgets" tab to create one.
+                    <div className="text-gray-400 text-sm py-4 text-center">
+                      No active budgets set. Go to the "Budgets" tab to create
+                      one.
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -89,13 +95,16 @@ function Dashboard() {
 
                         return (
                           <div key={budget.id} className="space-y-1">
-                            <div className="flex justify-between text-sm font-medium text-gray-700">
-                              <span>{budget.category_name || "All Categories"}</span>
+                            <div className="flex justify-between text-sm font-medium text-gray-300">
                               <span>
-                                ${Number(budget.spent_amount).toFixed(2)} / ${Number(budget.amount).toFixed(2)}
+                                {budget.category_name || "All Categories"}
+                              </span>
+                              <span>
+                                ${Number(budget.spent_amount).toFixed(2)} / $
+                                {Number(budget.amount).toFixed(2)}
                               </span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="w-full bg-gray-800 rounded-full h-2">
                               <div
                                 className={`h-2 rounded-full transition-all duration-500 ${barColor}`}
                                 style={{ width: `${Math.min(progress, 100)}%` }}
@@ -104,7 +113,12 @@ function Dashboard() {
                             <div className="flex justify-between text-xs text-gray-500">
                               <span>{Math.round(progress)}% used</span>
                               {budget.end_date && (
-                                <span>Ends {new Date(budget.end_date).toLocaleDateString()}</span>
+                                <span>
+                                  Ends{" "}
+                                  {new Date(
+                                    budget.end_date,
+                                  ).toLocaleDateString()}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -133,10 +147,10 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-slate-100 to-purple-50 flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-[#040404] text-gray-100 flex flex-col lg:flex-row">
       {/* Mobile Top Header */}
-      <div className="lg:hidden bg-white/70 backdrop-blur-md border-b border-white/20 px-4 py-3 flex justify-between items-center shadow-sm z-30 sticky top-0">
-        <h1 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-1.5">
+      <div className="lg:hidden border-b border-white/10 bg-[#070707]/90 px-4 py-3 flex justify-between items-center shadow-sm z-30 sticky top-0 backdrop-blur-xl">
+        <h1 className="text-xl font-extrabold text-white flex items-center gap-1.5">
           <span>💰</span> Expense Tracker
         </h1>
         <div className="flex items-center gap-3">
@@ -161,26 +175,28 @@ function Dashboard() {
 
       {/* Vertical Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 w-64 bg-white/35 backdrop-blur-xl border-r border-white/20 shadow-2xl z-50 flex flex-col justify-between p-6 transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 w-64 border-r border-white/10 bg-[#060606]/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col justify-between p-6 transition-transform duration-300 lg:translate-x-0 ${
           isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="space-y-6">
           {/* Brand Header */}
-          <div className="pb-4 border-b border-gray-200/50">
-            <h1 className="text-xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+          <div className="pb-4 border-b border-gray-200">
+            <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
               <span>💰</span> Smart Expense
             </h1>
           </div>
 
           {/* User Profile Card */}
           {user && (
-            <div className="bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-white/40 shadow-sm flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
+            <div className="bg-white/5 p-4 rounded-xl border border-white/10 shadow-sm flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a227] to-[#e2b84d] flex items-center justify-center text-black font-bold shadow-md">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-gray-800 truncate">{user.name}</p>
+                <p className="text-sm font-semibold text-gray-800 truncate">
+                  {user.name}
+                </p>
                 <p className="text-xs text-gray-500 truncate">{user.email}</p>
               </div>
             </div>
@@ -199,8 +215,8 @@ function Dashboard() {
                   }}
                   className={`w-full py-3 px-4 rounded-xl font-medium text-sm flex items-center gap-3 transition duration-200 ${
                     isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                      : "text-gray-600 hover:bg-white/50 hover:text-gray-900 border border-transparent"
+                      ? "bg-gradient-to-r from-[#c9a227] to-[#e2b84d] text-black shadow-lg"
+                      : "text-gray-300 hover:bg-white/10 hover:text-white border border-transparent"
                   }`}
                 >
                   <span className="text-lg">{tab.icon}</span>
@@ -212,16 +228,18 @@ function Dashboard() {
         </div>
 
         {/* Footer Area with Notification Bell & Logout */}
-        <div className="pt-4 border-t border-gray-200/50 space-y-4">
+        <div className="pt-4 border-t border-gray-200 space-y-4">
           {/* Notification Inbox on Desktop */}
-          <div className="hidden lg:flex items-center justify-between bg-white/30 p-2 rounded-xl border border-white/20">
-            <span className="text-xs font-semibold text-gray-500 pl-2">Alerts</span>
+          <div className="hidden lg:flex items-center justify-between bg-white/5 p-2 rounded-xl border border-white/10">
+            <span className="text-xs font-semibold text-gray-500 pl-2">
+              Alerts
+            </span>
             <NotificationInbox />
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition duration-200 border border-red-200/50"
+            className="w-full bg-white/10 hover:bg-gradient-to-r hover:from-[#c9a227] hover:to-[#e2b84d] text-gray-200 hover:text-black py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition duration-200 border border-white/10"
           >
             <span>🚪</span> Logout
           </button>
@@ -230,9 +248,7 @@ function Dashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 lg:ml-64 p-4 md:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {renderTabContent()}
-        </div>
+        <div className="max-w-7xl mx-auto">{renderTabContent()}</div>
       </main>
     </div>
   );

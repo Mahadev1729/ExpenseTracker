@@ -183,33 +183,33 @@ function ExpenseForm({ refresh }) {
   }
 
   return (
-    <div className="bg-white p-4 rounded shadow mb-4">
+    <div className="premium-card p-4 mb-4">
       <div className="mb-4">
         <button
           onClick={listening ? stopListening : startListening}
-          className="bg-green-500 text-white px-4 py-2 mr-2"
+          className="mr-2 rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-2 text-black"
         >
           {listening ? "Stop Listening" : "🎤 Voice Input"}
         </button>
         <button
           onClick={processVoice}
-          className="bg-blue-500 text-white px-4 py-2 mr-2"
+          className="mr-2 rounded-full border border-white/10 bg-[#1b1b1b] px-4 py-2 text-white"
         >
           Process Voice
         </button>
         <button
           onClick={resetTranscript}
-          className="bg-gray-500 text-white px-4 py-2"
+          className="rounded-full bg-gray-800 px-4 py-2 text-white"
         >
           Reset
         </button>
       </div>
 
       <div className="mb-4">
-        <p>Transcript: {transcript}</p>
+        <p className="text-gray-300">Transcript: {transcript}</p>
       </div>
 
-      <div className="mb-4 rounded border border-gray-200 bg-gray-50 p-2 text-sm">
+      <div className="mb-4 rounded-xl border border-white/10 bg-black/30 p-2 text-sm text-gray-300">
         <p>{isOnline ? "Online" : "Offline mode enabled"}</p>
         <p>
           {offlineCount > 0
@@ -221,7 +221,7 @@ function ExpenseForm({ refresh }) {
       <form onSubmit={submit}>
         <input
           placeholder="Title"
-          className="border p-2 mr-2"
+          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
           value={expense.title}
           onChange={(e) => setExpense({ ...expense, title: e.target.value })}
         />
@@ -229,13 +229,13 @@ function ExpenseForm({ refresh }) {
         <input
           placeholder="Amount"
           type="number"
-          className="border p-2 mr-2"
+          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
           value={expense.amount}
           onChange={(e) => setExpense({ ...expense, amount: e.target.value })}
         />
 
         <select
-          className="border p-2 mr-2"
+          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
           value={expense.category}
           onChange={(e) => setExpense({ ...expense, category: e.target.value })}
         >
@@ -248,12 +248,12 @@ function ExpenseForm({ refresh }) {
 
         <input
           type="date"
-          className="border p-2 mr-2"
+          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
           value={expense.date}
           onChange={(e) => setExpense({ ...expense, date: e.target.value })}
         />
 
-        <button className="bg-blue-500 text-white px-4 py-2">
+        <button className="rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-2 text-black">
           Add Expense
         </button>
       </form>

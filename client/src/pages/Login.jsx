@@ -22,17 +22,22 @@ function Login() {
       navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed: " + (error.response?.data?.message || "Please check your credentials."));
+      alert(
+        "Login failed: " +
+          (error.response?.data?.message || "Please check your credentials."),
+      );
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="flex items-center justify-center min-h-screen bg-[#040404]">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md"
+        className="premium-card w-full max-w-md p-8"
       >
-        <h2 className="text-3xl mb-6 text-center font-bold text-gray-800">Welcome Back</h2>
+        <h2 className="text-3xl mb-6 text-center font-bold text-white">
+          Welcome Back
+        </h2>
 
         <div className="mb-4">
           <input
@@ -54,12 +59,15 @@ function Login() {
           />
         </div>
 
-        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white w-full p-3 rounded-md font-medium hover:from-blue-700 hover:to-purple-700 transition duration-200">
+        <button className="w-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] p-3 font-semibold text-black transition duration-200 hover:brightness-110">
           Login
         </button>
 
-        <p className="text-center mt-4 text-sm text-gray-600">
-          Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register here</a>
+        <p className="text-center mt-4 text-sm text-gray-400">
+          Don't have an account?{" "}
+          <a href="/register" className="text-white hover:underline">
+            Register here
+          </a>
         </p>
       </form>
     </div>

@@ -20,14 +20,19 @@ function Register() {
       navigate("/login");
     } catch (error) {
       console.error("Registration error:", error);
-      alert("Registration failed: " + (error.response?.data?.message || "Please try again."));
+      alert(
+        "Registration failed: " +
+          (error.response?.data?.message || "Please try again."),
+      );
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <form onSubmit={submit} className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-3xl mb-6 text-center font-bold text-gray-800">Create Account</h2>
+    <div className="flex items-center justify-center min-h-screen bg-[#040404]">
+      <form onSubmit={submit} className="premium-card w-full max-w-md p-8">
+        <h2 className="text-3xl mb-6 text-center font-bold text-white">
+          Create Account
+        </h2>
 
         <div className="mb-4">
           <input
@@ -58,12 +63,15 @@ function Register() {
           />
         </div>
 
-        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white w-full p-3 rounded-md font-medium hover:from-blue-700 hover:to-purple-700 transition duration-200">
+        <button className="w-full rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] p-3 font-semibold text-black transition duration-200 hover:brightness-110">
           Register
         </button>
 
-        <p className="text-center mt-4 text-sm text-gray-600">
-          Already have an account? <a href="/login" className="text-blue-600 hover:underline">Login here</a>
+        <p className="text-center mt-4 text-sm text-gray-400">
+          Already have an account?{" "}
+          <a href="/login" className="text-white hover:underline">
+            Login here
+          </a>
         </p>
       </form>
     </div>

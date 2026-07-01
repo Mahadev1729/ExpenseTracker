@@ -2,8 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+  --accent: #c9a227;
+  --accent-soft: rgba(201, 162, 39, 0.16);
+}
+
 body {
-  @apply bg-gray-100;
+  @apply min-h-screen bg-[#040404] text-gray-100 antialiased;
+  background-image: radial-gradient(circle at top left, rgba(201, 162, 39, 0.16), transparent 28%), linear-gradient(135deg, #060606 0%, #0d0d0d 100%);
+}
+
+* {
+  @apply box-border;
+}
+
+::selection {
+  background-color: rgba(201, 162, 39, 0.35);
+  color: white;
+}
+
+.premium-card {
+  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.premium-input {
+  @apply rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-gray-500;
+}
+
+.premium-input:focus {
+  border-color: #c9a227;
+  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.3);
+  outline: none;
 }
 
 @keyframes slideIn {
@@ -11,6 +42,7 @@ body {
     transform: translateX(120%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
