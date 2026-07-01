@@ -54,7 +54,7 @@ function CircleRing({ percent, color, size = 80, stroke = 8, label, sublabel }) 
 ───────────────────────────────────────────── */
 function Card({ children, className = "" }) {
   return (
-    <div className={`bg-white rounded-xl shadow-md border border-gray-100 p-6 ${className}`}>
+    <div className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-white/60 p-6 ${className}`}>
       {children}
     </div>
   );
@@ -71,6 +71,173 @@ function FeasibilityBadge({ rating }) {
   if (rating === "unsafe")
     return <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-800 text-sm font-bold">🔴 Budget Breached</span>;
   return null;
+}
+
+/* ─────────────────────────────────────────────
+   SAVINGS GOAL TRACKER
+───────────────────────────────────────────── */
+function SavingsGoalTracker({ pacing, purchaseCost }) {
+  const [goal, setGoal] = useState(() => {
+    const saved = localStorage.getItem("savingsGoal");
+    return saved ? parseFloat(saved) : "";
+  });
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState(goal || "");
+
+  const saveGoal = () => {
+    const val = parseFloat(inputVal);
+    if (!isNaN(val) && val > 0) {
+      setGoal(val);
+      localStorage.setItem("savingsGoal", val);
+    }
+    setEditing(false);
+  };
+
+  const monthlyIncome = goal ? goal : null;
+  const savingsRate = monthlyIncome && pacing ? ((monthlyIncome - pacing.totalSpent) / monthlyIncome) * 100 : null;
+  const postPurchaseRate = monthlyIncome && pacing && purchaseCost
+    ? ((monthlyIncome - pacing.totalSpent - purchaseCost) / monthlyIncome) * 100
+    : null;
+
+  return (
+    <Card>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-700">🎯 Savings Goal Tracker</h3>
+        {!editing && (
+          <button
+            onClick={() => { setInputVal(goal || ""); setEditing(true); }}
+            className="text-xs text-blue-600 hover:text-blue-800 font-semibold transition"
+          >
+            {goal ? "Edit Goal" : "Set Goal"}
+          </button>
+        )}
+      </div>
+
+      {editing ? (
+        <div className="flex gap-2 items-center mb-4">
+          <span className="text-gray-500 text-sm">Monthly Income / Budget Target ($)</span>
+          <input
+            type="number"
+            value={inputVal}
+            onChange={(e) => setInputVal(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            placeholder="e.g. 3000"
+          />
+          <button
+            onClick={saveGoal}
+            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            className="px-3 py-1.5 bg-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-300 transition"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : !goal ? (
+        <div className="text-sm text-gray-500 bg-amber-50 border border-amber-200 rounded-lg p-3">
+          💡 Set your monthly income or savings target to see how each purchase impacts your savings rate.
+        </div>
+      ) : null}
+
+      {goal && pacing && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="bg-blue-50 rounded-xl p-3 text-center">
+              <div className="text-xl font-extrabold text-blue-700">${goal.toFixed(0)}</div>
+              <div className="text-xs text-blue-500 mt-0.5">Monthly Target</div>
+            </div>
+            <div className="bg-red-50 rounded-xl p-3 text-center">
+              <div className="text-xl font-extrabold text-red-700">${pacing.totalSpent.toFixed(0)}</div>
+              <div className="text-xs text-red-500 mt-0.5">Total Spent</div>
+            </div>
+            <div className="bg-green-50 rounded-xl p-3 text-center">
+              <div className="text-xl font-extrabold text-green-700">
+                {savingsRate !== null ? `${Math.max(savingsRate, 0).toFixed(1)}%` : "—"}
+              </div>
+              <div className="text-xs text-green-500 mt-0.5">Current Savings Rate</div>
+            </div>
+            {purchaseCost > 0 && postPurchaseRate !== null && (
+              <div className={`rounded-xl p-3 text-center ${postPurchaseRate < 0 ? "bg-red-100" : postPurchaseRate < savingsRate - 10 ? "bg-amber-50" : "bg-green-50"}`}>
+                <div className={`text-xl font-extrabold ${postPurchaseRate < 0 ? "text-red-700" : "text-gray-700"}`}>
+                  {Math.max(postPurchaseRate, 0).toFixed(1)}%
+                </div>
+                <div className="text-xs text-gray-500 mt-0.5">Rate After Purchase</div>
+              </div>
+            )}
+          </div>
+
+          {savingsRate !== null && (
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Savings Rate</span>
+                <span>{Math.max(savingsRate, 0).toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden relative">
+                <div
+                  className="h-full bg-green-500 rounded-full transition-all duration-700"
+                  style={{ width: `${Math.min(Math.max(savingsRate, 0), 100)}%` }}
+                />
+                {purchaseCost > 0 && postPurchaseRate !== null && (
+                  <div
+                    className="absolute top-0 h-full bg-red-400/60 rounded-full transition-all duration-700"
+                    style={{
+                      left: `${Math.min(Math.max(postPurchaseRate, 0), 100)}%`,
+                      width: `${Math.max(Math.min(savingsRate, 100) - Math.max(postPurchaseRate, 0), 0)}%`
+                    }}
+                  />
+                )}
+              </div>
+              {purchaseCost > 0 && postPurchaseRate !== null && savingsRate > postPurchaseRate && (
+                <p className="text-xs text-red-600 font-medium">
+                  ⚠️ This purchase reduces your savings rate by {(savingsRate - postPurchaseRate).toFixed(1)} percentage points.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   DECISION HISTORY ITEM
+───────────────────────────────────────────── */
+function HistoryItem({ entry, onAddExpense }) {
+  const ratingColors = {
+    safe: "border-green-200 bg-green-50",
+    warning: "border-amber-200 bg-amber-50",
+    unsafe: "border-red-200 bg-red-50",
+  };
+  const ratingIcons = { safe: "🟢", warning: "🟡", unsafe: "🔴" };
+
+  return (
+    <div className={`border rounded-xl p-4 flex items-center justify-between gap-3 ${ratingColors[entry.rating]}`}>
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="text-lg shrink-0">{ratingIcons[entry.rating]}</span>
+        <div className="min-w-0">
+          <p className="font-semibold text-sm text-gray-800 truncate">{entry.item}</p>
+          <p className="text-xs text-gray-500">{entry.category} · ${entry.cost.toFixed(2)} · {entry.time}</p>
+        </div>
+      </div>
+      {entry.rating !== "unsafe" && !entry.addedAsExpense && (
+        <button
+          onClick={() => onAddExpense(entry)}
+          className="shrink-0 text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-semibold transition"
+        >
+          + Add Expense
+        </button>
+      )}
+      {entry.addedAsExpense && (
+        <span className="shrink-0 text-xs bg-gray-200 text-gray-500 px-3 py-1.5 rounded-lg font-semibold">
+          ✅ Added
+        </span>
+      )}
+    </div>
+  );
 }
 
 /* ─────────────────────────────────────────────
@@ -91,6 +258,12 @@ function PacingAnalyzer({ expenses }) {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [result, setResult] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [addingExpense, setAddingExpense] = useState(false);
+  const [expenseAdded, setExpenseAdded] = useState(false);
+
+  // ── Decision History State ──
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // ── Load data ──
   const loadData = useCallback(async () => {
@@ -145,7 +318,10 @@ function PacingAnalyzer({ expenses }) {
     e.preventDefault();
     if (!cost || isNaN(Number(cost)) || Number(cost) <= 0) return;
 
+    setResult(null);
+    setExpenseAdded(false);
     setAnalysisLoading(true);
+
     setTimeout(() => {
       const purchaseCost = Number(cost);
 
@@ -170,11 +346,28 @@ function PacingAnalyzer({ expenses }) {
       let rating = "safe";
       let reasons = [];
       let suggestions = [];
+      let alternatives = [];
 
       // Check 1: Exceeds total budget
       if (purchaseCost > remaining) {
         rating = "unsafe";
         reasons.push(`This purchase ($${purchaseCost.toFixed(2)}) exceeds your remaining total budget ($${remaining.toFixed(2)}).`);
+
+        // Smart alternative: what's the max safe amount?
+        const safeMax = Math.max(remaining * 0.9, 0);
+        if (safeMax > 0) {
+          alternatives.push({
+            type: "reduced_amount",
+            label: `Consider spending $${safeMax.toFixed(2)} instead`,
+            description: `This would keep you within 90% of your remaining budget and leave $${(remaining - safeMax).toFixed(2)} as a cushion.`,
+          });
+        }
+        // Smart alternative: defer to next month
+        alternatives.push({
+          type: "defer",
+          label: "Defer to next month",
+          description: `Waiting until your next budget period starts gives you a fresh $${totalBudget.toFixed(2)} budget to work with.`,
+        });
       }
 
       // Check 2: Exceeds category budget
@@ -200,12 +393,26 @@ function PacingAnalyzer({ expenses }) {
             const cutPerWeek = weeksLeft > 0 ? (overBy / weeksLeft).toFixed(2) : overBy.toFixed(2);
             suggestions.push(`💡 To absorb this, cut ${topOther[0]} by $${cutPerWeek}/week for the remaining ${weeksLeft} week(s).`);
           }
+
+          // Safe alternative: max amount that fits in category budget
+          if (catRemaining > 0) {
+            alternatives.push({
+              type: "reduced_amount",
+              label: `Max safe amount for ${selectedCategory}: $${catRemaining.toFixed(2)}`,
+              description: `Spending exactly $${catRemaining.toFixed(2)} would completely use your ${selectedCategory} budget without exceeding it.`,
+            });
+          }
+        } else {
+          reasons.push(`✅ Within ${selectedCategory} budget. You have $${catRemaining.toFixed(2)} remaining in this category.`);
         }
       } else if (!matchedBudget && selectedCategory) {
         // No budget set for category — warn but not block
         if (rating === "safe" && purchaseCost > (remaining * 0.5)) {
           rating = "warning";
           reasons.push(`No budget set for ${selectedCategory}. This purchase uses ${((purchaseCost / totalBudget) * 100).toFixed(1)}% of your total monthly budget.`);
+          suggestions.push(`💡 Consider setting a monthly budget for "${selectedCategory}" to track this spending category precisely.`);
+        } else if (rating === "safe") {
+          reasons.push(`No specific budget for "${selectedCategory}", but this purchase is within your overall budget capacity.`);
         }
       }
 
@@ -217,12 +424,33 @@ function PacingAnalyzer({ expenses }) {
       if (rating === "safe") {
         reasons.push(`Great news! This purchase fits within your remaining budget of $${remaining.toFixed(2)}.`);
         suggestions.push(`✅ After this purchase, your safe daily spend limit becomes $${Math.max(newDailySafe, 0).toFixed(2)}/day for the remaining ${daysLeft} day(s).`);
+      } else if (rating === "warning") {
+        suggestions.push(`📅 You have ${daysLeft} day(s) left this month. Your remaining daily budget after this purchase: $${Math.max(newDailySafe, 0).toFixed(2)}/day.`);
       }
+
+      // Check 4: Pacing impact
+      if (pacing && pacing.isSpeeding && rating === "safe") {
+        rating = "warning";
+        reasons.push(`⚡ You are already spending faster than the calendar pace (${pacing.budgetProgress.toFixed(1)}% budget used vs ${pacing.calendarProgress.toFixed(1)}% of month elapsed).`);
+        suggestions.push(`💡 To get back on track, limit spending to $${pacing.dailySafeSpend.toFixed(2)}/day for the rest of the month.`);
+      }
+
+      const newEntry = {
+        id: Date.now(),
+        item,
+        cost: purchaseCost,
+        category: selectedCategory,
+        rating,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        date: new Date().toISOString().split("T")[0],
+        addedAsExpense: false,
+      };
 
       setResult({
         rating,
         reasons,
         suggestions,
+        alternatives,
         purchaseCost,
         categorySpent,
         postCategoryTotal,
@@ -232,8 +460,10 @@ function PacingAnalyzer({ expenses }) {
         remaining,
         newDailySafe: Math.max(newDailySafe, 0),
         daysLeft,
+        entry: newEntry,
       });
 
+      setHistory((prev) => [newEntry, ...prev.slice(0, 9)]);
       setAnalysisLoading(false);
 
       // Fire a toast if unsafe or warning
@@ -243,8 +473,60 @@ function PacingAnalyzer({ expenses }) {
           `$${purchaseCost.toFixed(2)} exceeds your remaining budget.`,
           "warning"
         );
+      } else if (rating === "warning") {
+        addToast(
+          `Caution: ${item || "Item"}`,
+          `This purchase requires careful consideration.`,
+          "budget"
+        );
       }
     }, 600);
+  };
+
+  // ── Add as Expense ──
+  const handleAddAsExpense = async (entryOrResult) => {
+    const entry = entryOrResult?.entry || entryOrResult;
+    setAddingExpense(true);
+    try {
+      await API.post("/expenses", {
+        title: entry.item,
+        amount: entry.cost,
+        category: entry.category,
+        date: entry.date || new Date().toISOString().split("T")[0],
+        notes: `Added via Decision Engine (${entry.rating} rating)`,
+      });
+      setExpenseAdded(true);
+      setHistory((prev) =>
+        prev.map((h) => (h.id === entry.id ? { ...h, addedAsExpense: true } : h))
+      );
+      addToast("Expense Added!", `${entry.item} ($${entry.cost.toFixed(2)}) has been recorded.`, "info");
+      // Refresh data
+      await loadData();
+    } catch (err) {
+      console.error("Error adding expense from Decision Engine:", err);
+      addToast("Error", "Could not add expense. Please try manually.", "warning");
+    }
+    setAddingExpense(false);
+  };
+
+  // ── History Add as Expense ──
+  const handleHistoryAddExpense = async (histEntry) => {
+    try {
+      await API.post("/expenses", {
+        title: histEntry.item,
+        amount: histEntry.cost,
+        category: histEntry.category,
+        date: histEntry.date || new Date().toISOString().split("T")[0],
+        notes: `Added via Decision Engine history (${histEntry.rating} rating)`,
+      });
+      setHistory((prev) =>
+        prev.map((h) => (h.id === histEntry.id ? { ...h, addedAsExpense: true } : h))
+      );
+      addToast("Expense Added!", `${histEntry.item} ($${histEntry.cost.toFixed(2)}) has been recorded.`, "info");
+      await loadData();
+    } catch (err) {
+      console.error("Error adding expense from history:", err);
+    }
   };
 
   /* ─── Pacing Speedometer Status ─── */
@@ -272,6 +554,8 @@ function PacingAnalyzer({ expenses }) {
     })
     .sort((a, b) => b.pct - a.pct);
 
+  const purchaseCostNum = parseFloat(cost) || 0;
+
   return (
     <div className="space-y-6">
       {/* ─── Header ─── */}
@@ -280,13 +564,49 @@ function PacingAnalyzer({ expenses }) {
           <h2 className="text-2xl font-bold text-gray-800">⚖️ Decision Engine & Pacing Monitor</h2>
           <p className="text-sm text-gray-500 mt-1">Real-time spending feasibility analysis based on your live budget data.</p>
         </div>
-        <button
-          onClick={loadData}
-          className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition"
-        >
-          🔄 Refresh Data
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 font-medium transition border border-purple-200 px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100"
+          >
+            📜 History ({history.length})
+          </button>
+          <button
+            onClick={loadData}
+            className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition"
+          >
+            🔄 Refresh Data
+          </button>
+        </div>
       </div>
+
+      {/* ─────────────────────────── DECISION HISTORY ─────────────────────────── */}
+      {showHistory && (
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-700">📜 Decision History</h3>
+            {history.length > 0 && (
+              <button
+                onClick={() => setHistory([])}
+                className="text-xs text-red-500 hover:text-red-700 font-medium transition"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
+          {history.length === 0 ? (
+            <div className="text-center py-6 text-gray-400 text-sm">
+              No decisions yet. Analyze a purchase to see it here.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {history.map((entry) => (
+                <HistoryItem key={entry.id} entry={entry} onAddExpense={handleHistoryAddExpense} />
+              ))}
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* ─────────────────────────── SECTION 1: Pacing Monitor ─────────────────────────── */}
       {pacing ? (
@@ -365,6 +685,9 @@ function PacingAnalyzer({ expenses }) {
         </Card>
       )}
 
+      {/* ─────────────────────────── SAVINGS GOAL TRACKER ─────────────────────────── */}
+      <SavingsGoalTracker pacing={pacing} purchaseCost={purchaseCostNum} />
+
       {/* ─────────────────────────── SECTION 2: Category Breakdown ─────────────────────────── */}
       {categoryBreakdown.length > 0 && (
         <Card>
@@ -399,11 +722,11 @@ function PacingAnalyzer({ expenses }) {
         </Card>
       )}
 
-      {/* ─────────────────────────── SECTION 3: Decision Engine ─────────────────────────── */}
+      {/* ─────────────────────────── SECTION 3: Decision Engine Form ─────────────────────────── */}
       <Card>
         <h3 className="text-lg font-semibold text-gray-700 mb-2">🤔 Can I Afford It?</h3>
         <p className="text-sm text-gray-500 mb-5">
-          Enter a potential purchase below. The engine instantly evaluates it against your live budget and pacing data.
+          Enter a potential purchase below. The engine instantly evaluates it against your live budget, pacing data, and savings goals.
         </p>
 
         <form onSubmit={analyze} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -423,7 +746,7 @@ function PacingAnalyzer({ expenses }) {
             <input
               type="number"
               value={cost}
-              onChange={(e) => { setCost(e.target.value); setResult(null); }}
+              onChange={(e) => { setCost(e.target.value); setResult(null); setExpenseAdded(false); }}
               placeholder="e.g. 149.99"
               min="0.01"
               step="0.01"
@@ -435,7 +758,7 @@ function PacingAnalyzer({ expenses }) {
             <label className="block text-xs font-semibold text-gray-600 mb-1">Category</label>
             <select
               value={selectedCategory}
-              onChange={(e) => { setSelectedCategory(e.target.value); setResult(null); }}
+              onChange={(e) => { setSelectedCategory(e.target.value); setResult(null); setExpenseAdded(false); }}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             >
@@ -451,7 +774,7 @@ function PacingAnalyzer({ expenses }) {
             <button
               type="submit"
               disabled={analysisLoading}
-              className="w-full sm:w-auto px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition disabled:opacity-60"
+              className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold text-sm transition disabled:opacity-60 shadow-md shadow-blue-500/20"
             >
               {analysisLoading ? "Analyzing…" : "🔍 Analyze Purchase"}
             </button>
@@ -491,11 +814,24 @@ function PacingAnalyzer({ expenses }) {
 
             {/* Suggestions */}
             {result.suggestions.length > 0 && (
-              <div className="space-y-1">
+              <div className="space-y-1 border-t border-gray-200/60 pt-3">
                 {result.suggestions.map((s, i) => (
                   <p key={i} className="text-sm font-medium text-gray-800">
                     {s}
                   </p>
+                ))}
+              </div>
+            )}
+
+            {/* Smart Alternatives */}
+            {result.alternatives && result.alternatives.length > 0 && (
+              <div className="space-y-2 border-t border-gray-200/60 pt-3">
+                <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">💡 Smart Alternatives</p>
+                {result.alternatives.map((alt, i) => (
+                  <div key={i} className="bg-white/70 rounded-lg p-3 border border-gray-200">
+                    <p className="text-sm font-semibold text-blue-700">{alt.label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{alt.description}</p>
+                  </div>
                 ))}
               </div>
             )}
@@ -561,6 +897,25 @@ function PacingAnalyzer({ expenses }) {
             <div className={`text-sm font-semibold ${result.newDailySafe > 0 ? "text-gray-700" : "text-red-700"}`}>
               📆 New Safe Daily Spend after this purchase: ${result.newDailySafe.toFixed(2)}/day for {result.daysLeft} remaining day(s)
             </div>
+
+            {/* ─── Add as Expense Button ─── */}
+            {result.rating !== "unsafe" && (
+              <div className="pt-2 border-t border-gray-200/60">
+                {expenseAdded ? (
+                  <div className="flex items-center gap-2 text-green-700 font-semibold text-sm">
+                    <span>✅</span> Expense added to your tracker successfully!
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => handleAddAsExpense(result)}
+                    disabled={addingExpense}
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-semibold text-sm transition disabled:opacity-60 shadow-md shadow-blue-500/20"
+                  >
+                    {addingExpense ? "Adding…" : "➕ Add as Expense"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )}
       </Card>
@@ -593,10 +948,10 @@ function PacingAnalyzer({ expenses }) {
               <thead>
                 <tr className="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wide">
                   <th className="px-3 py-2 rounded-tl-lg">Category</th>
-                  <th className="px-3 py-2">Monthly Avg</th>
+                  <th className="px-3 py-2">Monthly Spend</th>
                   <th className="px-3 py-2">Cut 25%</th>
                   <th className="px-3 py-2">Cut 50%</th>
-                  <th className="px-3 py-2 rounded-tr-lg">Daily Freed (50% cut)</th>
+                  <th className="px-3 py-2 rounded-tr-lg">Daily Freed (50%)</th>
                 </tr>
               </thead>
               <tbody>
