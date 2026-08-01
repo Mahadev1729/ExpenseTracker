@@ -13,7 +13,7 @@ export const NotificationProvider = ({ children }) => {
     const id = Date.now() + Math.random().toString(36).substr(2, 9);
     setToasts((prev) => [...prev, { id, title, message, type }]);
     
-    // Auto-remove toast after 6 seconds
+    
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 6000);
@@ -31,7 +31,7 @@ export const NotificationProvider = ({ children }) => {
         const prevIds = new Set(prev.map((n) => n.id));
         const newUnread = res.data.filter((n) => !n.is_read && !prevIds.has(n.id));
         
-        // Trigger a visual toast notification for each new unread item detected
+        
         newUnread.forEach((n) => {
           addToast(n.title, n.message, n.type);
         });
@@ -46,7 +46,7 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       fetchNotifications();
-      // Poll every 30 seconds for live background notification updates
+      
       const interval = setInterval(fetchNotifications, 30000);
       return () => clearInterval(interval);
     } else {
