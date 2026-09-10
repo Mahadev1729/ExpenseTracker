@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -225,7 +225,7 @@ function ExpenseForm({ refresh, isLoading = false }) {
       <form onSubmit={submit}>
         <input
           placeholder="Title"
-          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
+          className="border border-gray-700 bg-[#1a1a1a] text-white p-4 mr-2 rounded-md"
           value={expense.title}
           onChange={(e) => setExpense({ ...expense, title: e.target.value })}
         />
@@ -257,7 +257,7 @@ function ExpenseForm({ refresh, isLoading = false }) {
           onChange={(e) => setExpense({ ...expense, date: e.target.value })}
         />
 
-        <button className="rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-2 text-black">
+        <button className="rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-5 text-black">
           Add Expense
         </button>
       </form>

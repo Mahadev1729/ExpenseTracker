@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
 import { ShimmerList } from "./Shimmer";
 
@@ -333,13 +333,12 @@ function RecurringExpenseManager() {
             <div className="flex justify-between items-center text-sm text-gray-600">
               <span>Started: {expense.start_date}</span>
               <span
-                className={`font-medium ${
-                  getNextDueDate(expense) === "Overdue"
+                className={`font-medium ${getNextDueDate(expense) === "Overdue"
                     ? "text-red-600"
                     : getNextDueDate(expense) === "Due today"
                       ? "text-orange-600"
                       : "text-green-600"
-                }`}
+                  }`}
               >
                 {getNextDueDate(expense)}
               </span>

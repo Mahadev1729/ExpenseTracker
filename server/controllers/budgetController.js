@@ -35,6 +35,10 @@ exports.addBudget = async (req, res) => {
             budgetData.end_date = null;
         }
 
+        if (!budgetData.amount || parseFloat(budgetData.amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
+        }
+
         await budgetModel.addBudget(budgetData);
         res.json({ message: "Budget added successfully" });
     } catch (error) {
@@ -53,6 +57,10 @@ exports.updateBudget = async (req, res) => {
         }
         if (!budgetData.end_date) {
             budgetData.end_date = null;
+        }
+
+        if (budgetData.amount !== undefined && parseFloat(budgetData.amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
         }
 
         await budgetModel.updateBudget(id, budgetData);

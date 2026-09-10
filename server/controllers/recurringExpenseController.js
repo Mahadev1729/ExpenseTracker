@@ -1,4 +1,4 @@
-﻿const recurringExpenseModel = require("../models/recurringExpenseModel");
+const recurringExpenseModel = require("../models/recurringExpenseModel");
 
 exports.getRecurringExpenses = async (req, res) => {
     try {
@@ -16,6 +16,10 @@ exports.addRecurringExpense = async (req, res) => {
         const userId = req.user.id;
         const recurringExpenseData = { ...req.body, user_id: userId };
 
+        if (!recurringExpenseData.amount || parseFloat(recurringExpenseData.amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
+        }
+
         await recurringExpenseModel.addRecurringExpense(recurringExpenseData);
         res.json({ message: "Recurring expense added successfully" });
     } catch (error) {
@@ -28,6 +32,10 @@ exports.updateRecurringExpense = async (req, res) => {
     try {
         const { id } = req.params;
         const recurringExpenseData = req.body;
+
+        if (recurringExpenseData.amount !== undefined && parseFloat(recurringExpenseData.amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
+        }
 
         await recurringExpenseModel.updateRecurringExpense(id, recurringExpenseData);
         res.json({ message: "Recurring expense updated successfully" });

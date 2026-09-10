@@ -1,4 +1,4 @@
-﻿const expenseModel = require("../models/expenseModel");
+const expenseModel = require("../models/expenseModel");
 
 exports.getExpenses = async (req, res) => {
     try {
@@ -78,6 +78,10 @@ exports.addExpense = async (req, res) => {
             ...req.body
         };
 
+        if (!expense.amount || parseFloat(expense.amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
+        }
+
         await expenseModel.addExpense(expense);
 
         res.json({ message: "Expense added successfully" });
@@ -89,6 +93,10 @@ exports.addExpense = async (req, res) => {
 
 exports.updateExpense = async (req, res) => {
     try {
+        if (req.body.amount !== undefined && parseFloat(req.body.amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
+        }
+
         await expenseModel.updateExpense(req.params.id, req.body);
         res.json({ message: "Expense updated" });
     } catch (error) {
