@@ -187,8 +187,8 @@ function ExpenseForm({ refresh, isLoading = false }) {
   }
 
   return (
-    <div className="premium-card p-4 mb-4">
-      <div className="mb-4">
+    <div className="premium-card p-7 mb-5">
+      <iv className="mb-4">
         <button
           onClick={listening ? stopListening : startListening}
           className="mr-2 rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-2 text-black"
@@ -207,7 +207,7 @@ function ExpenseForm({ refresh, isLoading = false }) {
         >
           Reset
         </button>
-      </div>
+      </iv>
 
       <div className="mb-4">
         <p className="text-gray-300">Transcript: {transcript}</p>
@@ -225,7 +225,7 @@ function ExpenseForm({ refresh, isLoading = false }) {
       <form onSubmit={submit}>
         <input
           placeholder="Title"
-          className="border border-gray-700 bg-[#1a1a1a] text-white p-4 mr-2 rounded-md"
+          className="border border-gray-700 bg-[#1a1a1a] text-white p-4 mr-2 mb-4 rounded-md"
           value={expense.title}
           onChange={(e) => setExpense({ ...expense, title: e.target.value })}
         />
