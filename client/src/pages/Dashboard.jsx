@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import { NotificationContext } from "../context/NotificationContext";
 import { AuthContext } from "../context/context";
+import { useTheme } from "../context/ThemeContext";
 import NotificationInbox from "../components/NotificationInbox";
+import PWAInstallPrompt from "../components/PWAInstallPrompt";
 
 import ExpenseForm from "../components/ExpenseForm";
 import ExpenseTable from "../components/ExpenseTable";
@@ -24,6 +26,7 @@ function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const { refresh: refreshNotifications } = useContext(NotificationContext);
   const { user, logout } = useContext(AuthContext);
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -165,17 +168,38 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#040404] text-gray-100 flex flex-col lg:flex-row">
+    <div
+      className="min-h-screen flex flex-col lg:flex-row"
+      style={{ backgroundColor: "var(--bg-root)", color: "var(--text-primary)" }}
+    >
       {/* Mobile Top Header */}
-      <div className="lg:hidden border-b border-white/10 bg-[#070707]/90 px-4 py-3 flex justify-between items-center shadow-sm z-30 sticky top-0 backdrop-blur-xl">
-        <h1 className="text-xl font-extrabold text-white flex items-center gap-1.5">
+      <div
+        className="lg:hidden px-4 py-3 flex justify-between items-center shadow-sm z-30 sticky top-0 backdrop-blur-xl"
+        style={{
+          backgroundColor: "var(--bg-sidebar)",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <h1 className="text-xl font-extrabold flex items-center gap-1.5" style={{ color: "var(--text-heading)" }}>
           <span>💰</span> Expense Tracker
         </h1>
         <div className="flex items-center gap-3">
+          {/* Theme toggle — mobile */}
+          <button
+            onClick={toggleTheme}
+            className="theme-toggle-btn"
+            aria-label="Toggle theme"
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            <span className="text-lg transition-transform duration-300" style={{ display: "block" }}>
+              {theme === "dark" ? "☀️" : "🌙"}
+            </span>
+          </button>
           <NotificationInbox />
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none"
+            className="p-2 focus:outline-none"
+            style={{ color: "var(--text-secondary)" }}
             aria-label="Open menu"
           >
             <span className="text-2xl">☰</span>
@@ -193,29 +217,32 @@ function Dashboard() {
 
       {/* Vertical Sidebar */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 w-64 border-r border-white/10 bg-[#060606]/95 backdrop-blur-xl shadow-2xl z-50 flex flex-col justify-between p-6 transition-transform duration-300 lg:translate-x-0 ${
+        className={`sidebar-bg fixed top-0 bottom-0 left-0 w-64 backdrop-blur-xl z-50 flex flex-col justify-between p-6 transition-transform duration-300 lg:translate-x-0 ${
           isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="space-y-6">
           {/* Brand Header */}
-          <div className="pb-4 border-b border-gray-200">
-            <h1 className="text-xl font-extrabold text-white flex items-center gap-2">
+          <div className="pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
+            <h1 className="text-xl font-extrabold flex items-center gap-2" style={{ color: "var(--text-heading)" }}>
               <span>💰</span> Smart Expense
             </h1>
           </div>
 
           {/* User Profile Card */}
           {user && (
-            <div className="bg-white/5 p-4 rounded-xl border border-white/10 shadow-sm flex items-center gap-3">
+            <div
+              className="p-4 rounded-xl shadow-sm flex items-center gap-3"
+              style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)" }}
+            >
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c9a227] to-[#e2b84d] flex items-center justify-center text-black font-bold shadow-md">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-gray-800 truncate">
+                <p className="text-sm font-semibold truncate" style={{ color: "var(--text-heading)" }}>
                   {user.name}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{user.email}</p>
               </div>
             </div>
           )}
@@ -245,19 +272,46 @@ function Dashboard() {
           </nav>
         </div>
 
-        {/* Footer Area with Notification Bell & Logout */}
-        <div className="pt-4 border-t border-gray-200 space-y-4">
-          {/* Notification Inbox on Desktop */}
-          <div className="hidden lg:flex items-center justify-between bg-white/5 p-2 rounded-xl border border-white/10">
-            <span className="text-xs font-semibold text-gray-500 pl-2">
+        {/* Footer Area with Notification Bell, Theme Toggle & Logout */}
+        <div className="pt-4 space-y-3" style={{ borderTop: "1px solid var(--border)" }}>
+          {/* Notification + Theme Toggle Row on Desktop */}
+          <div
+            className="hidden lg:flex items-center justify-between p-2 rounded-xl"
+            style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)" }}
+          >
+            <span className="text-xs font-semibold pl-2" style={{ color: "var(--text-muted)" }}>
               Alerts
             </span>
-            <NotificationInbox />
+            <div className="flex items-center gap-1">
+              {/* Theme toggle — desktop */}
+              <button
+                onClick={toggleTheme}
+                className="theme-toggle-btn"
+                aria-label="Toggle theme"
+                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                <span className="text-base">{theme === "dark" ? "☀️" : "🌙"}</span>
+              </button>
+              <NotificationInbox />
+            </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="w-full bg-white/10 hover:bg-gradient-to-r hover:from-[#c9a227] hover:to-[#e2b84d] text-gray-200 hover:text-black py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition duration-200 border border-white/10"
+            className="w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition duration-200"
+            style={{
+              backgroundColor: "var(--bg-card)",
+              border: "1px solid var(--border)",
+              color: "var(--text-secondary)",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = "linear-gradient(to right, #c9a227, #e2b84d)";
+              e.currentTarget.style.color = "#000";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = "var(--bg-card)";
+              e.currentTarget.style.color = "var(--text-secondary)";
+            }}
           >
             <span>🚪</span> Logout
           </button>
@@ -268,6 +322,9 @@ function Dashboard() {
       <main className="flex-1 lg:ml-64 p-4 md:p-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto">{renderTabContent()}</div>
       </main>
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 }

@@ -65,13 +65,24 @@ function NotificationInbox() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-2xl border border-gray-100 py-1 z-50 text-gray-800">
-          <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-lg">
-            <h3 className="font-semibold text-gray-700 text-sm">Notifications</h3>
+        <div
+          className="absolute right-0 mt-2 w-80 rounded-xl shadow-2xl py-1 z-50"
+          style={{
+            backgroundColor: "var(--bg-sidebar)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-card)",
+          }}
+        >
+          <div
+            className="px-4 py-2 flex justify-between items-center rounded-t-xl"
+            style={{ borderBottom: "1px solid var(--border)", backgroundColor: "var(--bg-card)" }}
+          >
+            <h3 className="font-semibold text-sm" style={{ color: "var(--text-heading)" }}>Notifications</h3>
             {notifications.length > 0 && (
               <button
                 onClick={clearAll}
-                className="text-xs text-red-500 hover:text-red-700 font-medium transition"
+                className="text-xs font-medium transition"
+                style={{ color: "#ef4444" }}
               >
                 Clear All
               </button>
@@ -90,40 +101,52 @@ function NotificationInbox() {
                 const isRecurring = n.type === "recurring";
                 
                 let icon = "ℹ️";
-                let iconBg = "bg-blue-100";
+                let iconBg = "rgba(59,130,246,0.12)";
                 
                 if (isBudget) {
                   icon = "⚠️";
-                  iconBg = "bg-red-100";
+                  iconBg = "rgba(239,68,68,0.12)";
                 } else if (isRecurring) {
                   icon = "📅";
-                  iconBg = "bg-indigo-100";
+                  iconBg = "rgba(99,102,241,0.12)";
                 }
 
                 return (
                   <div
                     key={n.id}
                     onClick={() => handleNotificationClick(n)}
-                    className={`px-4 py-3 hover:bg-gray-50 flex items-start gap-3 border-b border-gray-50 cursor-pointer transition ${
-                      !n.is_read ? "bg-blue-50/40" : ""
+                    className={`px-4 py-3 flex items-start gap-3 cursor-pointer transition ${
+                      !n.is_read ? "" : ""
                     }`}
+                    style={{
+                      borderBottom: "1px solid var(--border)",
+                      backgroundColor: !n.is_read ? "var(--accent-soft)" : "transparent",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--bg-card-hover)"}
+                    onMouseLeave={e => e.currentTarget.style.backgroundColor = !n.is_read ? "var(--accent-soft)" : "transparent"}
                   >
-                    <div className={`p-2 rounded-full ${iconBg} text-base flex items-center justify-center shrink-0`}>
+                    <div
+                      className="p-2 rounded-full text-base flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: iconBg }}
+                    >
                       {icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start gap-2">
-                        <p className={`text-xs font-semibold truncate ${!n.is_read ? "text-gray-900" : "text-gray-600"}`}>
+                        <p
+                          className={`text-xs font-semibold truncate`}
+                          style={{ color: !n.is_read ? "var(--text-heading)" : "var(--text-secondary)" }}
+                        >
                           {n.title}
                         </p>
                         {!n.is_read && (
                           <span className="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-1"></span>
                         )}
                       </div>
-                      <p className="text-xxs text-gray-500 text-[11px] mt-0.5 leading-snug">
+                      <p className="text-[11px] mt-0.5 leading-snug" style={{ color: "var(--text-muted)" }}>
                         {n.message}
                       </p>
-                      <p className="text-[10px] text-gray-400 mt-1">
+                      <p className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>
                         {formatTime(n.created_at)}
                       </p>
                     </div>

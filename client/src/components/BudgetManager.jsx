@@ -24,11 +24,7 @@ function BudgetManager() {
   const loadAllData = async () => {
     try {
       setIsLoading(true);
-      await Promise.all([
-        fetchBudgets(),
-        fetchCategories(),
-        fetchBudgetProgress(),
-      ]);
+      await Promise.all([fetchBudgets(), fetchCategories(), fetchBudgetProgress()]);
     } finally {
       setIsLoading(false);
     }
@@ -67,32 +63,32 @@ function BudgetManager() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Convert empty category_id to null to avoid DB error
     const payload = { ...formData };
-    if (!payload.category_id) {
-      payload.category_id = null;
-    }
+    if (!payload.category_id) payload.category_id = null;
     try {
       if (editingId) {
         await API.put(`/budgets/${editingId}`, payload);
       } else {
         await API.post("/budgets", payload);
       }
-      // Refresh data and reset form
       fetchBudgets();
       fetchBudgetProgress();
       setShowForm(false);
-      setFormData({
-        category_id: "",
-        amount: "",
-        period: "monthly",
-        start_date: new Date().toISOString().split("T")[0],
-        end_date: "",
-      });
-      setEditingId(null);
+      resetForm();
     } catch (error) {
       console.error("Error saving budget:", error);
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      category_id: "",
+      amount: "",
+      period: "monthly",
+      start_date: new Date().toISOString().split("T")[0],
+      end_date: "",
+    });
+    setEditingId(null);
   };
 
   const handleEdit = (budget) => {
@@ -120,221 +116,238 @@ function BudgetManager() {
   };
 
   const getProgressColor = (progress) => {
-    if (progress >= 100) return "bg-red-500";
-    if (progress >= 80) return "bg-yellow-500";
-    return "bg-green-500";
+    if (progress >= 100) return "#ef4444";
+    if (progress >= 80) return "#eab308";
+    return "#22c55e";
+  };
+
+  const getProgressBg = (progress) => {
+    if (progress >= 100) return "rgba(239,68,68,0.15)";
+    if (progress >= 80) return "rgba(234,179,8,0.15)";
+    return "rgba(34,197,94,0.15)";
   };
 
   const getCategoryName = (categoryId) => {
     const category = categories.find((cat) => cat.id === categoryId);
-    return category ? category.name : "All Categories";
+    return category ? `${category.icon || ""} ${category.name}` : "All Categories";
   };
 
+  const inputCls = "w-full premium-input px-3 py-2 text-sm focus:outline-none";
+  const labelCls = "block text-xs font-semibold uppercase tracking-wide mb-1";
+
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Budget Manager</h2>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200"
-        >
-          {showForm ? "Cancel" : "Add Budget"}
-        </button>
-      </div>
-
-      {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="mb-6 p-4 bg-gray-50 rounded-lg"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category
-              </label>
-              <select
-                value={formData.category_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, category_id: e.target.value })
-                }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Categories</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.icon} {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={(e) =>
-                  setFormData({ ...formData, amount: e.target.value })
-                }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Period
-              </label>
-              <select
-                value={formData.period}
-                onChange={(e) =>
-                  setFormData({ ...formData, period: e.target.value })
-                }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="quarterly">Quarterly</option>
-                <option value="yearly">Yearly</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Date
-              </label>
-              <input
-                type="date"
-                value={formData.start_date}
-                onChange={(e) =>
-                  setFormData({ ...formData, start_date: e.target.value })
-                }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Date (Optional)
-              </label>
-              <input
-                type="date"
-                value={formData.end_date}
-                onChange={(e) =>
-                  setFormData({ ...formData, end_date: e.target.value })
-                }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="premium-card p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "var(--accent)" }}>
+              Financial Planning
+            </p>
+            <h2 className="text-2xl font-bold mt-1" style={{ color: "var(--text-heading)" }}>
+              Budget Manager
+            </h2>
           </div>
-          <div className="mt-4 flex gap-2">
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-200"
-            >
-              {editingId ? "Update" : "Add"} Budget
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowForm(false);
-                setFormData({
-                  category_id: "",
-                  amount: "",
-                  period: "monthly",
-                  start_date: new Date().toISOString().split("T")[0],
-                  end_date: "",
-                });
-                setEditingId(null);
-              }}
-              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-200"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
-
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            Budget Progress
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {budgetProgress.map((budget) => (
-              <div
-                key={budget.id}
-                className="border border-gray-200 p-4 rounded-lg"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-800">
-                    {budget.category_name || "All Categories"}
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    ${budget.spent_amount || 0} / ${budget.amount}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-                  <div
-                    className={`h-3 rounded-full transition-all duration-300 ${getProgressColor(budget.progress_percentage || 0)}`}
-                    style={{
-                      width: `${Math.min(budget.progress_percentage || 0, 100)}%`,
-                    }}
-                  ></div>
-                </div>
-                <div className="text-sm text-gray-600">
-                  {Math.round(budget.progress_percentage || 0)}% used
-                </div>
-              </div>
-            ))}
-          </div>
+          <button
+            onClick={() => { setShowForm(!showForm); if (showForm) resetForm(); }}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+            style={{
+              background: showForm
+                ? "var(--bg-card)"
+                : "linear-gradient(to right, #c9a227, #e2b84d)",
+              color: showForm ? "var(--text-primary)" : "#000",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {showForm ? "✕ Cancel" : "+ Add Budget"}
+          </button>
         </div>
 
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            Your Budgets
+        {/* Form */}
+        {showForm && (
+          <form onSubmit={handleSubmit} className="mt-6 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <label className={labelCls} style={{ color: "var(--text-muted)" }}>Category</label>
+                <select
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                  className={inputCls}
+                >
+                  <option value="">All Categories</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls} style={{ color: "var(--text-muted)" }}>Amount (₹)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  className={inputCls}
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+              <div>
+                <label className={labelCls} style={{ color: "var(--text-muted)" }}>Period</label>
+                <select
+                  value={formData.period}
+                  onChange={(e) => setFormData({ ...formData, period: e.target.value })}
+                  className={inputCls}
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+              <div>
+                <label className={labelCls} style={{ color: "var(--text-muted)" }}>Start Date</label>
+                <input
+                  type="date"
+                  value={formData.start_date}
+                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  className={inputCls}
+                  required
+                />
+              </div>
+              <div>
+                <label className={labelCls} style={{ color: "var(--text-muted)" }}>End Date (Optional)</label>
+                <input
+                  type="date"
+                  value={formData.end_date}
+                  onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                  className={inputCls}
+                />
+              </div>
+            </div>
+            <div className="mt-5 flex gap-3">
+              <button
+                type="submit"
+                className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:brightness-110"
+                style={{ background: "linear-gradient(to right, #c9a227, #e2b84d)", color: "#000" }}
+              >
+                {editingId ? "Update Budget" : "Save Budget"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowForm(false); resetForm(); }}
+                className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* Budget Progress */}
+      {budgetProgress.length > 0 && (
+        <div className="premium-card p-6">
+          <h3 className="text-lg font-bold mb-4" style={{ color: "var(--text-heading)" }}>
+            📊 Live Budget Progress
           </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {budgetProgress.map((budget) => {
+              const pct = Math.min(budget.progress_percentage || 0, 100);
+              const barColor = getProgressColor(budget.progress_percentage || 0);
+              const badgeBg = getProgressBg(budget.progress_percentage || 0);
+              return (
+                <div
+                  key={budget.id}
+                  className="rounded-xl p-4 space-y-2"
+                  style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-semibold text-sm" style={{ color: "var(--text-heading)" }}>
+                      {budget.category_name || "All Categories"}
+                    </span>
+                    <span
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
+                      style={{ backgroundColor: badgeBg, color: barColor }}
+                    >
+                      {Math.round(budget.progress_percentage || 0)}%
+                    </span>
+                  </div>
+                  <div className="w-full rounded-full h-2" style={{ backgroundColor: "var(--border)" }}>
+                    <div
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${pct}%`, backgroundColor: barColor }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs" style={{ color: "var(--text-muted)" }}>
+                    <span>₹{Number(budget.spent_amount || 0).toFixed(2)} spent</span>
+                    <span>₹{Number(budget.amount).toFixed(2)} limit</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Budget Cards */}
+      <div className="premium-card p-6">
+        <h3 className="text-lg font-bold mb-4" style={{ color: "var(--text-heading)" }}>
+          🗂️ Your Budgets
+        </h3>
+        {budgets.length === 0 ? (
+          <div className="text-center py-10" style={{ color: "var(--text-muted)" }}>
+            <p className="text-4xl mb-3">📋</p>
+            <p className="font-medium">No budgets yet</p>
+            <p className="text-sm mt-1">Click &quot;+ Add Budget&quot; to create your first budget.</p>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {budgets.map((budget) => (
               <div
                 key={budget.id}
-                className="border border-gray-200 p-4 rounded-lg"
+                className="rounded-xl p-4 transition-all duration-200 hover:scale-[1.01]"
+                style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
               >
-                <div className="flex justify-between items-start mb-2">
+                <div className="flex justify-between items-start mb-3">
                   <div>
-                    <span className="font-medium text-gray-800">
+                    <p className="font-semibold text-sm" style={{ color: "var(--text-heading)" }}>
                       {getCategoryName(budget.category_id)}
-                    </span>
-                    <div className="text-sm text-gray-600 capitalize">
+                    </p>
+                    <p className="text-xs capitalize mt-0.5" style={{ color: "var(--text-muted)" }}>
                       {budget.period}
-                    </div>
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(budget)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="p-1.5 rounded-lg transition-all hover:scale-110"
+                      style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                      title="Edit"
                     >
                       ✏️
                     </button>
                     <button
                       onClick={() => handleDelete(budget.id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="p-1.5 rounded-lg transition-all hover:scale-110"
+                      style={{ backgroundColor: "rgba(239,68,68,0.12)", color: "#ef4444" }}
+                      title="Delete"
                     >
                       🗑️
                     </button>
                   </div>
                 </div>
-                <div className="text-lg font-bold text-gray-800">
-                  ${budget.amount}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {budget.start_date}{" "}
-                  {budget.end_date && `to ${budget.end_date}`}
-                </div>
+                <p className="text-xl font-bold" style={{ color: "var(--accent)" }}>
+                  ₹{Number(budget.amount).toFixed(2)}
+                </p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+                  {budget.start_date}{budget.end_date ? ` → ${budget.end_date}` : " (ongoing)"}
+                </p>
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

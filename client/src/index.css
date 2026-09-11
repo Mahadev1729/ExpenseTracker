@@ -2,15 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* ═══════════════════════════════════════════════
+   THEME TOKENS — Dark (default)
+═══════════════════════════════════════════════ */
+:root,
+[data-theme="dark"] {
   color-scheme: dark;
-  --accent: #c9a227;
-  --accent-soft: rgba(201, 162, 39, 0.16);
+
+  --accent:            #c9a227;
+  --accent-soft:       rgba(201, 162, 39, 0.16);
+  --accent-glow:       rgba(201, 162, 39, 0.3);
+
+  --bg-root:           #040404;
+  --bg-sidebar:        rgba(6, 6, 6, 0.95);
+  --bg-card:           rgba(255, 255, 255, 0.04);
+  --bg-card-hover:     rgba(255, 255, 255, 0.07);
+  --bg-input:          rgba(255, 255, 255, 0.05);
+  --bg-overlay:        rgba(0, 0, 0, 0.35);
+
+  --border:            rgba(255, 255, 255, 0.10);
+  --border-strong:     rgba(255, 255, 255, 0.18);
+
+  --text-primary:      #f3f4f6;
+  --text-secondary:    #9ca3af;
+  --text-muted:        #6b7280;
+  --text-heading:      #ffffff;
+
+  --shadow-card:       0 20px 60px rgba(0, 0, 0, 0.35);
+  --shadow-sidebar:    10px 0 40px rgba(0, 0, 0, 0.4);
+
+  --bg-body-gradient:  radial-gradient(circle at top left, rgba(201, 162, 39, 0.12), transparent 28%),
+                       linear-gradient(135deg, #060606 0%, #0d0d0d 100%);
+}
+
+/* ═══════════════════════════════════════════════
+   THEME TOKENS — Light
+═══════════════════════════════════════════════ */
+[data-theme="light"] {
+  color-scheme: light;
+
+  --accent:            #b8880e;
+  --accent-soft:       rgba(184, 136, 14, 0.12);
+  --accent-glow:       rgba(184, 136, 14, 0.25);
+
+  --bg-root:           #f4f5f7;
+  --bg-sidebar:        rgba(255, 255, 255, 0.97);
+  --bg-card:           rgba(255, 255, 255, 0.90);
+  --bg-card-hover:     rgba(255, 255, 255, 1);
+  --bg-input:          rgba(248, 249, 250, 1);
+  --bg-overlay:        rgba(0, 0, 0, 0.20);
+
+  --border:            rgba(0, 0, 0, 0.09);
+  --border-strong:     rgba(0, 0, 0, 0.16);
+
+  --text-primary:      #1f2937;
+  --text-secondary:    #4b5563;
+  --text-muted:        #9ca3af;
+  --text-heading:      #111827;
+
+  --shadow-card:       0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-sidebar:    2px 0 16px rgba(0, 0, 0, 0.06);
+
+  --bg-body-gradient:  radial-gradient(circle at top right, rgba(184, 136, 14, 0.07), transparent 35%),
+                       linear-gradient(135deg, #f0f2f5 0%, #e8eaee 100%);
+}
+
+/* ═══════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════ */
+html {
+  transition: color-scheme 0.3s ease;
 }
 
 body {
-  @apply min-h-screen bg-[#040404] text-gray-100 antialiased;
-  background-image: radial-gradient(circle at top left, rgba(201, 162, 39, 0.16), transparent 28%), linear-gradient(135deg, #060606 0%, #0d0d0d 100%);
+  @apply min-h-screen antialiased;
+  background-color: var(--bg-root);
+  background-image: var(--bg-body-gradient);
+  color: var(--text-primary);
+  transition: background-color 0.35s ease, color 0.35s ease, background-image 0.35s ease;
 }
 
 * {
@@ -18,37 +87,101 @@ body {
 }
 
 ::selection {
-  background-color: rgba(201, 162, 39, 0.35);
-  color: white;
+  background-color: var(--accent-glow);
+  color: var(--text-heading);
 }
 
+/* ═══════════════════════════════════════════════
+   COMPONENT CLASSES
+═══════════════════════════════════════════════ */
 .premium-card {
-  @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  @apply rounded-2xl backdrop-blur-xl;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.premium-card:hover {
+  background-color: var(--bg-card-hover);
 }
 
 .premium-input {
-  @apply rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-gray-500;
+  @apply rounded-xl;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, border-color 0.2s ease, color 0.3s ease;
+}
+
+.premium-input::placeholder {
+  color: var(--text-muted);
 }
 
 .premium-input:focus {
-  border-color: #c9a227;
-  box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.3);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
   outline: none;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(120%);
-    opacity: 0;
-  }
+/* ── Sidebar ── */
+.sidebar-bg {
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow-sidebar);
+  transition: background-color 0.35s ease, border-color 0.35s ease;
+}
 
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+/* ── Theme-aware text utilities ── */
+.theme-text-primary   { color: var(--text-primary); }
+.theme-text-secondary { color: var(--text-secondary); }
+.theme-text-muted     { color: var(--text-muted); }
+.theme-text-heading   { color: var(--text-heading); }
+.theme-border         { border-color: var(--border); }
+.theme-bg-card        { background-color: var(--bg-card); }
+.theme-bg-input       { background-color: var(--bg-input); }
+
+/* ── Theme Toggle Button ── */
+.theme-toggle-btn {
+  @apply relative inline-flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ── Animations ── */
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
 }
 
 .animate-slide-in {
   animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── PWA Install Banner ── */
+.pwa-banner {
+  @apply fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4
+         px-5 py-3 rounded-2xl shadow-2xl;
+  background-color: var(--bg-card);
+  border: 1px solid var(--accent);
+  box-shadow: 0 8px 32px var(--accent-glow), var(--shadow-card);
+  backdrop-filter: blur(16px);
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-width: 420px;
+  width: calc(100% - 32px);
 }
