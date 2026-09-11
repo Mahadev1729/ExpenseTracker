@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -10,11 +10,13 @@ import {
   getPendingExpenses,
 } from "../utils/offlineStorage";
 import { ShimmerExpenseForm } from "./Shimmer";
+import { NotificationContext } from "../context/NotificationContext";
 
 function ExpenseForm({ refresh, isLoading = false }) {
   if (isLoading) {
     return <ShimmerExpenseForm />;
   }
+  const { addToast } = useContext(NotificationContext);
   const [categories, setCategories] = useState([]);
   const [expense, setExpense] = useState({
     title: "",
@@ -150,6 +152,16 @@ function ExpenseForm({ refresh, isLoading = false }) {
 
   const submit = async (e) => {
     e.preventDefault();
+
+    if (parseFloat(expense.amount) < 0) {
+      addToast(
+        "Invalid Amount",
+        "Amount cannot be negative. Please enter a valid positive amount.",
+        "warning"
+      );
+      return;
+    }
+
     const payload = { ...expense };
 
     try {
