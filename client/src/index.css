@@ -124,6 +124,25 @@ body {
   outline: none;
 }
 
+/* ── Native Select & Option Styles (High Contrast & Clear Visibility) ── */
+select.premium-input,
+select {
+  color: var(--text-primary);
+}
+
+select.premium-input option,
+select option {
+  background-color: #121212;
+  color: #f3f4f6;
+  padding: 8px;
+}
+
+[data-theme="light"] select.premium-input option,
+[data-theme="light"] select option {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
 /* ── Sidebar ── */
 .sidebar-bg {
   background-color: var(--bg-sidebar);

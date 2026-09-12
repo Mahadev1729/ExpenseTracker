@@ -1,10 +1,42 @@
-﻿const categoryModel = require("../models/categoryModel");
+const DEFAULT_CATEGORY_ICONS = {
+    "bills & utilities": "💡",
+    "bills": "💡",
+    "utilities": "💡",
+    "education": "🎓",
+    "entertainment": "🎬",
+    "food & dining": "🍔",
+    "food": "🍔",
+    "dining": "🍽️",
+    "healthcare": "🏥",
+    "health": "🏥",
+    "medical": "💊",
+    "shopping": "🛍️",
+    "transportation": "🚗",
+    "travel": "✈️",
+    "groceries": "🛒",
+    "salary": "💵",
+    "investment": "📈",
+    "personal": "👤",
+    "other": "📦",
+};
+
+function sanitizeIcon(icon, name) {
+    if (icon && icon !== "?" && icon !== "null" && icon.trim() !== "") {
+        return icon;
+    }
+    const key = (name || "").toLowerCase().trim();
+    return DEFAULT_CATEGORY_ICONS[key] || "";
+}
 
 exports.getCategories = async (req, res) => {
     try {
         const userId = req.user.id;
         const categories = await categoryModel.getCategoriesByUser(userId);
-        res.json(categories);
+        const cleaned = categories.map((cat) => ({
+            ...cat,
+            icon: sanitizeIcon(cat.icon, cat.name),
+        }));
+        res.json(cleaned);
     } catch (error) {
         console.error("Get categories error:", error);
         res.status(500).json({ message: "Internal server error" });

@@ -14,6 +14,7 @@ if (process.env.MYSQL_URL) {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    charset: "utf8mb4",
     ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : undefined,
   });
 }

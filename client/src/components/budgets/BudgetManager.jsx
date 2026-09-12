@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../../services/api";
 import { ShimmerBudgetManager } from "../shared/Shimmer";
+import { formatCategoryLabel } from "../../utils/categoryIcons";
 
 function BudgetManager() {
   const [budgets, setBudgets] = useState([]);
@@ -129,7 +130,7 @@ function BudgetManager() {
 
   const getCategoryName = (categoryId) => {
     const category = categories.find((cat) => cat.id === categoryId);
-    return category ? `${category.icon || ""} ${category.name}` : "All Categories";
+    return category ? formatCategoryLabel(category.icon, category.name) : "All Categories";
   };
 
   const inputCls = "w-full premium-input px-3 py-2 text-sm focus:outline-none";
@@ -176,7 +177,7 @@ function BudgetManager() {
                 >
                   <option value="">All Categories</option>
                   {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                    <option key={c.id} value={c.id}>{formatCategoryLabel(c.icon, c.name)}</option>
                   ))}
                 </select>
               </div>

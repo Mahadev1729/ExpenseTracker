@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useContext } from "react";
 import API from "../../services/api";
 import { NotificationContext } from "../../context/NotificationContext";
 import { ShimmerChart } from "../shared/Shimmer";
+import { formatCategoryLabel } from "../../utils/categoryIcons";
 
 /* ─────────────────────────────────────────────
    HELPER UTILITIES
@@ -992,7 +993,7 @@ function PacingAnalyzer({ expenses, isLoading = false }) {
               <option value="">Select category…</option>
               {categories.map((c) => (
                 <option key={c.id} value={c.name}>
-                  {c.icon} {c.name}
+                  {formatCategoryLabel(c.icon, c.name)}
                 </option>
               ))}
             </select>

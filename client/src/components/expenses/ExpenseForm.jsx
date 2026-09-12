@@ -11,6 +11,7 @@ import {
 } from "../../utils/offlineStorage";
 import { ShimmerExpenseForm } from "../shared/Shimmer";
 import { NotificationContext } from "../../context/NotificationContext";
+import { formatCategoryLabel } from "../../utils/categoryIcons";
 
 function ExpenseForm({ refresh, isLoading = false }) {
   if (isLoading) {
@@ -290,7 +291,7 @@ function ExpenseForm({ refresh, isLoading = false }) {
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.name}>
-                  {c.icon} {c.name}
+                  {formatCategoryLabel(c.icon, c.name)}
                 </option>
               ))}
             </select>

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import API from "../../services/api";
 import { generateExpensePDF } from "../../utils/pdfGenerator";
 import { ShimmerTable } from "../shared/Shimmer";
+import { formatCategoryLabel } from "../../utils/categoryIcons";
 
 function ExpenseTable({
   expenses: initialExpenses,
@@ -263,7 +264,7 @@ function ExpenseTable({
                 <option value="">All Categories</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
-                    {category.icon} {category.name}
+                    {formatCategoryLabel(category.icon, category.name)}
                   </option>
                 ))}
               </select>

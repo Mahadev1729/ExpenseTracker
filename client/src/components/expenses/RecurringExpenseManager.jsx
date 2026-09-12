@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../../services/api";
 import { ShimmerList } from "../shared/Shimmer";
+import { formatCategoryLabel } from "../../utils/categoryIcons";
 
 function RecurringExpenseManager() {
   const [recurringExpenses, setRecurringExpenses] = useState([]);
@@ -219,7 +220,7 @@ function RecurringExpenseManager() {
                 <option value="">Select Category</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
-                    {category.icon} {category.name}
+                    {formatCategoryLabel(category.icon, category.name)}
                   </option>
                 ))}
               </select>

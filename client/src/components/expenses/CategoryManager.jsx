@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../../services/api";
 import { ShimmerList } from "../shared/Shimmer";
+import { getCategoryIcon } from "../../utils/categoryIcons";
 
 function CategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -193,7 +194,7 @@ function CategoryManager() {
                   style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl shrink-0">{category.icon}</span>
+                    <span className="text-2xl shrink-0">{getCategoryIcon(category.icon, category.name)}</span>
                     <div className="min-w-0">
                       <span className="font-semibold text-sm truncate block" style={{ color: "var(--text-heading)" }}>
                         {category.name}
@@ -239,7 +240,7 @@ function CategoryManager() {
                 className="p-3.5 rounded-xl flex items-center gap-3 opacity-80"
                 style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
               >
-                <span className="text-2xl shrink-0">{category.icon}</span>
+                <span className="text-2xl shrink-0">{getCategoryIcon(category.icon, category.name)}</span>
                 <div className="min-w-0">
                   <span className="font-semibold text-sm truncate block" style={{ color: "var(--text-heading)" }}>
                     {category.name}
