@@ -1,3 +1,5 @@
+const categoryModel = require("../models/categoryModel");
+
 const DEFAULT_CATEGORY_ICONS = {
     "bills & utilities": "💡",
     "bills": "💡",

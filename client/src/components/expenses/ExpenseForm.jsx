@@ -13,16 +13,28 @@ import { ShimmerExpenseForm } from "../shared/Shimmer";
 import { NotificationContext } from "../../context/NotificationContext";
 import { formatCategoryLabel } from "../../utils/categoryIcons";
 
+const FALLBACK_CATEGORIES = [
+  { id: "default-1", name: "Bills & Utilities", icon: "💡" },
+  { id: "default-2", name: "Food & Dining", icon: "🍔" },
+  { id: "default-3", name: "Transportation", icon: "🚗" },
+  { id: "default-4", name: "Shopping", icon: "🛍️" },
+  { id: "default-5", name: "Healthcare", icon: "🏥" },
+  { id: "default-6", name: "Entertainment", icon: "🎬" },
+  { id: "default-7", name: "Education", icon: "🎓" },
+  { id: "default-8", name: "Travel", icon: "✈️" },
+  { id: "default-9", name: "Other", icon: "📦" },
+];
+
 function ExpenseForm({ refresh, isLoading = false }) {
   if (isLoading) {
     return <ShimmerExpenseForm />;
   }
   const { addToast } = useContext(NotificationContext);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
   const [expense, setExpense] = useState({
     title: "",
     amount: "",
-    category: "",
+    category: FALLBACK_CATEGORIES[0].name,
     date: new Date().toISOString().split("T")[0],
     notes: "",
   });
@@ -32,11 +44,11 @@ function ExpenseForm({ refresh, isLoading = false }) {
   const fetchCategories = useCallback(async () => {
     try {
       const response = await API.get("/categories");
-      setCategories(response.data);
-      if (response.data.length > 0) {
+      if (response.data && response.data.length > 0) {
+        setCategories(response.data);
         setExpense((prev) => ({
           ...prev,
-          category: response.data[0].name,
+          category: prev.category || response.data[0].name,
         }));
       }
     } catch (error) {
