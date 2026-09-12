@@ -46,6 +46,7 @@ A full-stack financial tracking application built with **React (Vite)** on the f
 │  │ • categoryRoutes│  │ • categoryCtrl  │  │ • Body Parser   │                  │
 │  │ • budgetRoutes  │  │ • budgetCtrl    │  │                 │                  │
 │  │ • recurringRoute│  │ • recurringCtrl │  │                 │                  │
+│  │ • incomeRoutes  │  │ • incomeCtrl    │  │                 │                  │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘                  │
 │           │                       │                       │                     │
 │           └───────────────────────┼───────────────────────┘                     │
@@ -63,9 +64,10 @@ A full-stack financial tracking application built with **React (Vite)** on the f
 │  │                 │  │                 │  │                 │                  │
 │  │ • userModel     │  │ • db.js         │  │ • Aiven MySQL   │                  │
 │  │ • expenseModel  │  │ • SSL Support   │  │ • Local MySQL   │                  │
-│  │ • categoryModel │  │ • Custom Ports  │  │ • 6 Tables      │                  │
+│  │ • categoryModel │  │ • Custom Ports  │  │ • 7 Tables      │                  │
 │  │ • budgetModel   │  │                 │  │                 │                  │
 │  │ • recurringModel│  │                 │  │                 │                  │
+│  │ • incomeModel   │  │                 │  │                 │                  │
 │  └─────────────────┘  └─────────────────┘  └─────────────────┘                  │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -160,3 +162,4 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 4. `budgets` — Spending thresholds and category limits.
 5. `recurring_expenses` — Subscriptions and recurring bills.
 6. `notifications` — Dynamic in-app budget alerts and reminders.
+7. `incomes` — Income entries, sources (Salary, Freelance, etc.), amounts, and dates.
