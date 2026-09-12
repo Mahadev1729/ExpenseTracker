@@ -66,7 +66,7 @@ function NotificationInbox() {
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-80 rounded-xl shadow-2xl py-1 z-50"
+          className="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-xl shadow-2xl py-1 z-50 animate-fade-up"
           style={{
             backgroundColor: "var(--bg-sidebar)",
             border: "1px solid var(--border)",

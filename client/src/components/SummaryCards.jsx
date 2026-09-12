@@ -1,4 +1,4 @@
-﻿import { ShimmerSummaryCards } from "./Shimmer";
+import { ShimmerSummaryCards } from "./Shimmer";
 
 function SummaryCards({ expenses, isLoading = false }) {
   if (isLoading) {
@@ -8,21 +8,31 @@ function SummaryCards({ expenses, isLoading = false }) {
   const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <div className="premium-card p-4">
-        <h3 className="text-gray-400">Total Expenses</h3>
-        <p className="text-xl font-bold text-white">₹{total}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+      <div className="premium-card p-4 sm:p-5">
+        <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+          Total Expenses
+        </h3>
+        <p className="text-xl sm:text-2xl font-black mt-1" style={{ color: "var(--accent)" }}>
+          ₹{total.toFixed(2)}
+        </p>
       </div>
 
-      <div className="premium-card p-4">
-        <h3 className="text-gray-400">Total Transactions</h3>
-        <p className="text-xl font-bold text-white">{expenses.length}</p>
+      <div className="premium-card p-4 sm:p-5">
+        <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+          Total Transactions
+        </h3>
+        <p className="text-xl sm:text-2xl font-black mt-1" style={{ color: "var(--text-heading)" }}>
+          {expenses.length}
+        </p>
       </div>
 
-      <div className="premium-card p-4">
-        <h3 className="text-gray-400">Average</h3>
-        <p className="text-xl font-bold text-white">
-          ₹{expenses.length ? (total / expenses.length).toFixed(2) : 0}
+      <div className="premium-card p-4 sm:p-5">
+        <h3 className="text-xs sm:text-sm font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+          Average Expense
+        </h3>
+        <p className="text-xl sm:text-2xl font-black mt-1" style={{ color: "var(--text-heading)" }}>
+          ₹{expenses.length ? (total / expenses.length).toFixed(2) : "0.00"}
         </p>
       </div>
     </div>

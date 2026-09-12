@@ -14,19 +14,19 @@ function Navbar() {
 
   return (
     <nav className="border-b border-white/10 bg-[#060606]/90 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <h1 className="text-xl font-semibold tracking-[0.2em] text-white">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16 gap-2">
+          <div className="flex items-center min-w-0">
+            <div className="flex-shrink min-w-0">
+              <h1 className="text-sm sm:text-xl font-semibold tracking-normal sm:tracking-[0.2em] text-white truncate">
                 Smart Expense Tracker
               </h1>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {user && (
-              <div className="flex items-center space-x-4">
-                <span className="text-white text-sm font-medium">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <span className="hidden md:inline text-white text-sm font-medium truncate max-w-[150px]">
                   Welcome, {user.name}
                 </span>
                 <NotificationInbox />
@@ -34,7 +34,7 @@ function Navbar() {
             )}
             <button
               onClick={handleLogout}
-              className="bg-gradient-to-r from-[#c9a227] to-[#e2b84d] text-black hover:brightness-110 px-4 py-2 rounded-full text-sm font-semibold transition duration-200 shadow-[0_8px_20px_rgba(201,162,39,0.2)]"
+              className="bg-gradient-to-r from-[#c9a227] to-[#e2b84d] text-black hover:brightness-110 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition duration-200 shadow-[0_8px_20px_rgba(201,162,39,0.2)]"
             >
               Logout
             </button>

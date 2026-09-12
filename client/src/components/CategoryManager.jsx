@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
 import { ShimmerList } from "./Shimmer";
 
@@ -75,25 +75,40 @@ function CategoryManager() {
   const customCategories = categories.filter((cat) => cat.user_id);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Category Manager</h2>
+    <div className="premium-card p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--text-heading)" }}>
+            Category Manager
+          </h2>
+          <p className="text-xs sm:text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
+            Manage and personalize your expense categories
+          </p>
+        </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+          className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold transition duration-200"
+          style={{
+            background: showForm
+              ? "var(--bg-card)"
+              : "linear-gradient(to right, #c9a227, #e2b84d)",
+            color: showForm ? "var(--text-primary)" : "#000",
+            border: "1px solid var(--border)",
+          }}
         >
-          {showForm ? "Cancel" : "Add Category"}
+          {showForm ? "✕ Cancel" : "+ Add Category"}
         </button>
       </div>
 
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 p-4 bg-gray-50 rounded-lg"
+          className="mb-6 p-4 rounded-xl space-y-4"
+          style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Name
               </label>
               <input
@@ -102,25 +117,31 @@ function CategoryManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
+                placeholder="e.g. Health & Fitness"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Color
               </label>
-              <input
-                type="color"
-                value={formData.color}
-                onChange={(e) =>
-                  setFormData({ ...formData, color: e.target.value })
-                }
-                className="w-full h-10 border border-gray-300 rounded-md cursor-pointer"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={formData.color}
+                  onChange={(e) =>
+                    setFormData({ ...formData, color: e.target.value })
+                  }
+                  className="w-12 h-10 rounded-xl cursor-pointer p-0 border-0 bg-transparent"
+                />
+                <span className="text-xs font-mono" style={{ color: "var(--text-secondary)" }}>
+                  {formData.color}
+                </span>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Icon
               </label>
               <input
@@ -129,17 +150,18 @@ function CategoryManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, icon: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
                 placeholder="📊"
               />
             </div>
           </div>
-          <div className="mt-4 flex gap-2">
+          <div className="flex flex-wrap gap-2 pt-2">
             <button
               type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-200"
+              className="w-full sm:w-auto px-5 py-2 rounded-xl text-sm font-semibold transition duration-200"
+              style={{ background: "linear-gradient(to right, #c9a227, #e2b84d)", color: "#000" }}
             >
-              {editingId ? "Update" : "Add"} Category
+              {editingId ? "Update Category" : "Save Category"}
             </button>
             <button
               type="button"
@@ -148,7 +170,8 @@ function CategoryManager() {
                 setFormData({ name: "", color: "#3B82F6", icon: "📊" });
                 setEditingId(null);
               }}
-              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-200"
+              className="w-full sm:w-auto px-5 py-2 rounded-xl text-sm font-semibold transition duration-200"
+              style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
             >
               Cancel
             </button>
@@ -159,37 +182,42 @@ function CategoryManager() {
       <div className="space-y-6">
         {customCategories.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">
-              Your Categories
+            <h3 className="text-base sm:text-lg font-semibold mb-3" style={{ color: "var(--text-heading)" }}>
+              Your Custom Categories
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {customCategories.map((category) => (
                 <div
                   key={category.id}
-                  className="border border-gray-200 p-4 rounded-lg flex items-center justify-between"
+                  className="p-3.5 rounded-xl flex items-center justify-between"
+                  style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{category.icon}</span>
-                    <div>
-                      <span className="font-medium text-gray-800">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-2xl shrink-0">{category.icon}</span>
+                    <div className="min-w-0">
+                      <span className="font-semibold text-sm truncate block" style={{ color: "var(--text-heading)" }}>
                         {category.name}
                       </span>
                       <div
-                        className="w-4 h-4 rounded-full mt-1"
+                        className="w-3.5 h-3.5 rounded-full mt-1"
                         style={{ backgroundColor: category.color }}
                       ></div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => handleEdit(category)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="p-1.5 rounded-lg text-sm transition hover:scale-110"
+                      style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                      title="Edit"
                     >
                       ✏️
                     </button>
                     <button
                       onClick={() => handleDelete(category.id)}
-                      className="text-red-600 hover:text-red-800"
+                      className="p-1.5 rounded-lg text-sm transition hover:scale-110"
+                      style={{ backgroundColor: "rgba(239,68,68,0.12)", color: "#ef4444" }}
+                      title="Delete"
                     >
                       🗑️
                     </button>
@@ -201,22 +229,23 @@ function CategoryManager() {
         )}
 
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
-            Default Categories
+          <h3 className="text-base sm:text-lg font-semibold mb-3" style={{ color: "var(--text-heading)" }}>
+            Default System Categories
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {defaultCategories.map((category) => (
               <div
                 key={category.id}
-                className="border border-gray-200 p-4 rounded-lg flex items-center gap-3 opacity-75"
+                className="p-3.5 rounded-xl flex items-center gap-3 opacity-80"
+                style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
               >
-                <span className="text-2xl">{category.icon}</span>
-                <div>
-                  <span className="font-medium text-gray-800">
+                <span className="text-2xl shrink-0">{category.icon}</span>
+                <div className="min-w-0">
+                  <span className="font-semibold text-sm truncate block" style={{ color: "var(--text-heading)" }}>
                     {category.name}
                   </span>
                   <div
-                    className="w-4 h-4 rounded-full mt-1"
+                    className="w-3.5 h-3.5 rounded-full mt-1"
                     style={{ backgroundColor: category.color }}
                   ></div>
                 </div>

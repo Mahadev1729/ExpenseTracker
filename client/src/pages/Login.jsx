@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import API from "../services/api";
 import { AuthContext } from "../context/context";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const { login } = useContext(AuthContext);
@@ -23,16 +23,16 @@ function Login() {
 
   return (
     <div
-      className="flex items-center justify-center min-h-screen"
+      className="flex items-center justify-center min-h-screen px-4 py-8 sm:py-12"
       style={{ backgroundColor: "var(--bg-root)" }}
     >
-      <form onSubmit={handleSubmit} className="premium-card w-full max-w-md p-8 animate-fade-up">
-        <div className="text-center mb-8">
+      <form onSubmit={handleSubmit} className="premium-card w-full max-w-md p-6 sm:p-8 animate-fade-up">
+        <div className="text-center mb-6 sm:mb-8">
           <p className="text-3xl mb-2">💰</p>
-          <h2 className="text-3xl font-bold" style={{ color: "var(--text-heading)" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--text-heading)" }}>
             Welcome Back
           </h2>
-          <p className="text-sm mt-2" style={{ color: "var(--text-muted)" }}>
+          <p className="text-sm mt-1.5" style={{ color: "var(--text-muted)" }}>
             Sign in to your account
           </p>
         </div>
@@ -73,9 +73,9 @@ function Login() {
 
         <p className="text-center mt-5 text-sm" style={{ color: "var(--text-muted)" }}>
           Don&apos;t have an account?{" "}
-          <a href="/register" className="font-semibold hover:underline" style={{ color: "var(--accent)" }}>
+          <Link to="/register" className="font-semibold hover:underline" style={{ color: "var(--accent)" }}>
             Register here
-          </a>
+          </Link>
         </p>
       </form>
     </div>

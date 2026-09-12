@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -162,14 +162,19 @@ function DashboardCharts({ expenses, isLoading = false }) {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          boxWidth: 12,
+          font: { size: 11 },
+        },
       },
       tooltip: {
         callbacks: {
           label: function (context) {
-            return `${context.dataset.label}: $${context.parsed.y}`;
+            return `${context.dataset.label || ""}: ₹${context.parsed.y ?? context.parsed}`;
           },
         },
       },
@@ -178,6 +183,7 @@ function DashboardCharts({ expenses, isLoading = false }) {
 
   const trendOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: "index",
       intersect: false,
@@ -185,6 +191,10 @@ function DashboardCharts({ expenses, isLoading = false }) {
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          boxWidth: 12,
+          font: { size: 11 },
+        },
       },
     },
     scales: {
@@ -194,7 +204,7 @@ function DashboardCharts({ expenses, isLoading = false }) {
         position: "left",
         title: {
           display: true,
-          text: "Amount ($)",
+          text: "Amount (₹)",
         },
       },
       y1: {
@@ -214,14 +224,19 @@ function DashboardCharts({ expenses, isLoading = false }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Analytics Dashboard
-        </h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--text-heading)" }}>
+            Analytics Dashboard
+          </h2>
+          <p className="text-xs sm:text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
+            Visual breakdowns and spending trends
+          </p>
+        </div>
         <select
           value={selectedPeriod}
           onChange={(e) => setSelectedPeriod(e.target.value)}
-          className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="premium-input px-3.5 py-2 text-xs sm:text-sm font-semibold focus:outline-none"
         >
           <option value="week">Last Week</option>
           <option value="month">Last Month</option>
@@ -231,55 +246,67 @@ function DashboardCharts({ expenses, isLoading = false }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="premium-card p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-4" style={{ color: "var(--text-heading)" }}>
             Expense Distribution by Category
           </h3>
-          <Pie data={pieData} options={chartOptions} />
+          <div className="relative h-64 sm:h-72 w-full">
+            <Pie data={pieData} options={chartOptions} />
+          </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="premium-card p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-4" style={{ color: "var(--text-heading)" }}>
             Top 10 Expenses
           </h3>
-          <Bar data={barData} options={chartOptions} />
+          <div className="relative h-64 sm:h-72 w-full">
+            <Bar data={barData} options={chartOptions} />
+          </div>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="premium-card p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-4" style={{ color: "var(--text-heading)" }}>
           Expense Trends (Last 6 Months)
         </h3>
-        <Line data={trendData} options={trendOptions} />
+        <div className="relative h-64 sm:h-80 w-full">
+          <Line data={trendData} options={trendOptions} />
+        </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="premium-card p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-4" style={{ color: "var(--text-heading)" }}>
           Category Statistics ({selectedPeriod})
         </h3>
-        <Bar data={categoryStatsData} options={chartOptions} />
+        <div className="relative h-64 sm:h-72 w-full">
+          <Bar data={categoryStatsData} options={chartOptions} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {expenseStats.slice(0, 3).map((stat, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow-lg">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+          <div key={index} className="premium-card p-4 sm:p-5">
+            <h4 className="text-base font-bold mb-3" style={{ color: "var(--text-heading)" }}>
               {stat.category}
             </h4>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total:</span>
-                <span className="font-bold text-green-600">
-                  ${stat.total_amount}
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center">
+                <span style={{ color: "var(--text-muted)" }}>Total:</span>
+                <span className="font-bold" style={{ color: "var(--accent)" }}>
+                  ₹{Number(stat.total_amount).toFixed(2)}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Average:</span>
-                <span className="font-bold">${stat.avg_amount}</span>
+              <div className="flex justify-between items-center">
+                <span style={{ color: "var(--text-muted)" }}>Average:</span>
+                <span className="font-semibold" style={{ color: "var(--text-heading)" }}>
+                  ₹{Number(stat.avg_amount).toFixed(2)}
+                </span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Count:</span>
-                <span className="font-bold">{stat.total_expenses}</span>
+              <div className="flex justify-between items-center">
+                <span style={{ color: "var(--text-muted)" }}>Count:</span>
+                <span className="font-semibold" style={{ color: "var(--text-heading)" }}>
+                  {stat.total_expenses}
+                </span>
               </div>
             </div>
           </div>

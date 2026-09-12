@@ -128,21 +128,40 @@ function RecurringExpenseManager() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Recurring Expenses</h2>
-        <div className="flex gap-2">
+    <div className="premium-card p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--text-heading)" }}>
+            Recurring Expenses
+          </h2>
+          <p className="text-xs sm:text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
+            Subscriptions, bills, and scheduled payments
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={processRecurringExpenses}
-            className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-200"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition duration-200"
+            style={{
+              backgroundColor: "var(--bg-input)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border)",
+            }}
           >
-            Process Due Expenses
+            ⚡ Process Due
           </button>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition duration-200"
+            style={{
+              background: showForm
+                ? "var(--bg-card)"
+                : "linear-gradient(to right, #c9a227, #e2b84d)",
+              color: showForm ? "var(--text-primary)" : "#000",
+              border: "1px solid var(--border)",
+            }}
           >
-            {showForm ? "Cancel" : "Add Recurring Expense"}
+            {showForm ? "✕ Cancel" : "+ Add Recurring"}
           </button>
         </div>
       </div>
@@ -150,40 +169,43 @@ function RecurringExpenseManager() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 p-4 bg-gray-50 rounded-lg"
+          className="mb-6 p-4 rounded-xl space-y-4"
+          style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Title
               </label>
               <input
                 type="text"
+                placeholder="e.g. Netflix Subscription"
                 value={formData.title}
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Amount
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+                Amount (₹)
               </label>
               <input
                 type="number"
                 step="0.01"
+                placeholder="0.00"
                 value={formData.amount}
                 onChange={(e) =>
                   setFormData({ ...formData, amount: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Category
               </label>
               <select
@@ -191,7 +213,7 @@ function RecurringExpenseManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
                 required
               >
                 <option value="">Select Category</option>
@@ -203,7 +225,7 @@ function RecurringExpenseManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Frequency
               </label>
               <select
@@ -211,7 +233,7 @@ function RecurringExpenseManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, frequency: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -220,7 +242,7 @@ function RecurringExpenseManager() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Start Date
               </label>
               <input
@@ -229,12 +251,12 @@ function RecurringExpenseManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, start_date: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 End Date (Optional)
               </label>
               <input
@@ -243,29 +265,31 @@ function RecurringExpenseManager() {
                 onChange={(e) =>
                   setFormData({ ...formData, end_date: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
               />
             </div>
           </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Notes
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+              Notes (Optional)
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) =>
                 setFormData({ ...formData, notes: e.target.value })
               }
-              className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="3"
+              className="w-full premium-input px-3.5 py-2.5 text-sm focus:outline-none"
+              rows="2"
+              placeholder="Add optional reminder or subscription notes..."
             ></textarea>
           </div>
-          <div className="mt-4 flex gap-2">
+          <div className="flex flex-wrap gap-2 pt-2">
             <button
               type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-200"
+              className="w-full sm:w-auto px-6 py-2 rounded-xl text-sm font-semibold transition duration-200"
+              style={{ background: "linear-gradient(to right, #c9a227, #e2b84d)", color: "#000" }}
             >
-              {editingId ? "Update" : "Add"} Recurring Expense
+              {editingId ? "Update Recurring" : "Save Recurring"}
             </button>
             <button
               type="button"
@@ -282,7 +306,8 @@ function RecurringExpenseManager() {
                 });
                 setEditingId(null);
               }}
-              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-200"
+              className="w-full sm:w-auto px-5 py-2 rounded-xl text-sm font-semibold transition duration-200"
+              style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
             >
               Cancel
             </button>
@@ -290,66 +315,84 @@ function RecurringExpenseManager() {
         </form>
       )}
 
-      <div className="space-y-4">
-        {recurringExpenses.map((expense) => (
-          <div
-            key={expense.id}
-            className="border border-gray-200 p-4 rounded-lg"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-800 text-lg">
-                    {expense.title}
-                  </span>
-                  <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded capitalize">
-                    {expense.frequency}
-                  </span>
-                </div>
-                <div className="text-gray-600">
-                  ${expense.amount} • {expense.category}
-                </div>
-                {expense.notes && (
-                  <div className="text-sm text-gray-500 mt-1">
-                    {expense.notes}
+      <div className="space-y-3">
+        {recurringExpenses.length === 0 ? (
+          <div className="text-center py-10" style={{ color: "var(--text-muted)" }}>
+            <p className="text-4xl mb-3">🔄</p>
+            <p className="font-medium">No recurring expenses set</p>
+            <p className="text-xs mt-1">Add your subscriptions or regular bills to automate tracking.</p>
+          </div>
+        ) : (
+          recurringExpenses.map((expense) => (
+            <div
+              key={expense.id}
+              className="p-4 rounded-xl transition duration-200"
+              style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="font-bold text-base sm:text-lg" style={{ color: "var(--text-heading)" }}>
+                      {expense.title}
+                    </span>
+                    <span
+                      className="text-xs px-2.5 py-0.5 rounded-full capitalize font-semibold"
+                      style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                    >
+                      {expense.frequency}
+                    </span>
                   </div>
+                  <div className="text-sm font-semibold" style={{ color: "var(--accent)" }}>
+                    ₹{Number(expense.amount).toFixed(2)}
+                    <span className="font-normal text-xs ml-1.5" style={{ color: "var(--text-muted)" }}>
+                      • {expense.category}
+                    </span>
+                  </div>
+                  {expense.notes && (
+                    <div className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                      {expense.notes}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-2 shrink-0 pt-1 sm:pt-0">
+                  <button
+                    onClick={() => handleEdit(expense)}
+                    className="p-1.5 rounded-lg text-sm transition hover:scale-110"
+                    style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                    title="Edit"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDelete(expense.id)}
+                    className="p-1.5 rounded-lg text-sm transition hover:scale-110"
+                    style={{ backgroundColor: "rgba(239,68,68,0.12)", color: "#ef4444" }}
+                    title="Delete"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap justify-between items-center text-xs mt-3 pt-2.5 gap-2" style={{ borderTop: "1px solid var(--border)", color: "var(--text-muted)" }}>
+                <span>Started: {expense.start_date}</span>
+                <span
+                  className={`font-semibold ${
+                    getNextDueDate(expense) === "Overdue"
+                      ? "text-red-500"
+                      : getNextDueDate(expense) === "Due today"
+                      ? "text-amber-500"
+                      : "text-emerald-400"
+                  }`}
+                >
+                  {getNextDueDate(expense)}
+                </span>
+                {expense.end_date && (
+                  <span>Ends: {expense.end_date}</span>
                 )}
               </div>
-              <div className="flex gap-2 ml-4">
-                <button
-                  onClick={() => handleEdit(expense)}
-                  className="text-blue-600 hover:text-blue-800"
-                >
-                  ✏️
-                </button>
-                <button
-                  onClick={() => handleDelete(expense.id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  🗑️
-                </button>
-              </div>
             </div>
-            <div className="flex justify-between items-center text-sm text-gray-600">
-              <span>Started: {expense.start_date}</span>
-              <span
-                className={`font-medium ${getNextDueDate(expense) === "Overdue"
-                    ? "text-red-600"
-                    : getNextDueDate(expense) === "Due today"
-                      ? "text-orange-600"
-                      : "text-green-600"
-                  }`}
-              >
-                {getNextDueDate(expense)}
-              </span>
-            </div>
-            {expense.end_date && (
-              <div className="text-sm text-gray-600 mt-1">
-                Ends: {expense.end_date}
-              </div>
-            )}
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

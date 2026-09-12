@@ -138,19 +138,19 @@ function BudgetManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="premium-card p-6">
-        <div className="flex justify-between items-center">
+      <div className="premium-card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "var(--accent)" }}>
               Financial Planning
             </p>
-            <h2 className="text-2xl font-bold mt-1" style={{ color: "var(--text-heading)" }}>
+            <h2 className="text-xl sm:text-2xl font-bold mt-1" style={{ color: "var(--text-heading)" }}>
               Budget Manager
             </h2>
           </div>
           <button
             onClick={() => { setShowForm(!showForm); if (showForm) resetForm(); }}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
             style={{
               background: showForm
                 ? "var(--bg-card)"
@@ -166,7 +166,7 @@ function BudgetManager() {
         {/* Form */}
         {showForm && (
           <form onSubmit={handleSubmit} className="mt-6 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               <div>
                 <label className={labelCls} style={{ color: "var(--text-muted)" }}>Category</label>
                 <select
@@ -225,10 +225,10 @@ function BudgetManager() {
                 />
               </div>
             </div>
-            <div className="mt-5 flex gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <button
                 type="submit"
-                className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:brightness-110"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:brightness-110"
                 style={{ background: "linear-gradient(to right, #c9a227, #e2b84d)", color: "#000" }}
               >
                 {editingId ? "Update Budget" : "Save Budget"}
@@ -236,7 +236,7 @@ function BudgetManager() {
               <button
                 type="button"
                 onClick={() => { setShowForm(false); resetForm(); }}
-                className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
                 style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
               >
                 Cancel
@@ -248,11 +248,11 @@ function BudgetManager() {
 
       {/* Budget Progress */}
       {budgetProgress.length > 0 && (
-        <div className="premium-card p-6">
-          <h3 className="text-lg font-bold mb-4" style={{ color: "var(--text-heading)" }}>
+        <div className="premium-card p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-bold mb-4" style={{ color: "var(--text-heading)" }}>
             📊 Live Budget Progress
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {budgetProgress.map((budget) => {
               const pct = Math.min(budget.progress_percentage || 0, 100);
               const barColor = getProgressColor(budget.progress_percentage || 0);
@@ -292,8 +292,8 @@ function BudgetManager() {
       )}
 
       {/* Budget Cards */}
-      <div className="premium-card p-6">
-        <h3 className="text-lg font-bold mb-4" style={{ color: "var(--text-heading)" }}>
+      <div className="premium-card p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-bold mb-4" style={{ color: "var(--text-heading)" }}>
           🗂️ Your Budgets
         </h3>
         {budgets.length === 0 ? (
@@ -303,7 +303,7 @@ function BudgetManager() {
             <p className="text-sm mt-1">Click &quot;+ Add Budget&quot; to create your first budget.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {budgets.map((budget) => (
               <div
                 key={budget.id}

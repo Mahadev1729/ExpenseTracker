@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Shimmer/Skeleton Loading Component
  * Provides reusable shimmer animations for different UI elements
  */
@@ -7,7 +7,7 @@
 export function ShimmerBase({ className = "" }) {
   return (
     <div
-      className={`animate-shimmer bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%] ${className}`}
+      className={`animate-shimmer bg-gradient-to-r from-white/5 via-white/15 to-white/5 bg-[length:200%_100%] ${className}`}
     />
   );
 }
@@ -15,7 +15,7 @@ export function ShimmerBase({ className = "" }) {
 // Card skeleton with header and content
 export function ShimmerCard() {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+    <div className="premium-card p-4 sm:p-6 space-y-4">
       <ShimmerBase className="h-6 w-3/4 rounded" />
       <ShimmerBase className="h-4 w-full rounded" />
       <ShimmerBase className="h-4 w-5/6 rounded" />
@@ -30,11 +30,11 @@ export function ShimmerCard() {
 // Summary cards row (for dashboard top cards)
 export function ShimmerSummaryCards() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="bg-white rounded-lg shadow-md p-6 space-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="premium-card p-4 sm:p-5 space-y-3">
           <ShimmerBase className="h-4 w-1/2 rounded" />
-          <ShimmerBase className="h-8 w-2/3 rounded" />
+          <ShimmerBase className="h-7 w-2/3 rounded" />
           <ShimmerBase className="h-3 w-1/3 rounded" />
         </div>
       ))}
@@ -45,7 +45,7 @@ export function ShimmerSummaryCards() {
 // Chart skeleton
 export function ShimmerChart() {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+    <div className="premium-card p-4 sm:p-6 space-y-4">
       <ShimmerBase className="h-6 w-1/3 rounded" />
       <div className="space-y-2">
         {[...Array(5)].map((_, i) => (
@@ -63,10 +63,10 @@ export function ShimmerChart() {
 // Table skeleton
 export function ShimmerTable({ rows = 5, columns = 5 }) {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-6">
+    <div className="premium-card overflow-hidden">
+      <div className="p-4 sm:p-6">
         {/* Header */}
-        <div className="flex gap-4 pb-4 mb-4 border-b">
+        <div className="flex gap-4 pb-4 mb-4 border-b border-white/10">
           {[...Array(columns)].map((_, i) => (
             <ShimmerBase key={i} className="h-4 flex-1 rounded" />
           ))}
@@ -89,7 +89,7 @@ export function ShimmerTable({ rows = 5, columns = 5 }) {
 // List item skeleton
 export function ShimmerListItem() {
   return (
-    <div className="bg-white rounded-lg p-4 space-y-3">
+    <div className="p-4 rounded-xl space-y-3" style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}>
       <div className="flex justify-between items-start">
         <div className="space-y-2 flex-1">
           <ShimmerBase className="h-5 w-2/3 rounded" />
@@ -115,17 +115,19 @@ export function ShimmerList({ items = 5 }) {
 // Expense form skeleton
 export function ShimmerExpenseForm() {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
+    <div className="premium-card p-4 sm:p-6 space-y-4">
       <ShimmerBase className="h-6 w-1/2 rounded" />
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="space-y-2">
-            <ShimmerBase className="h-4 w-1/4 rounded" />
-            <ShimmerBase className="h-10 w-full rounded" />
+            <ShimmerBase className="h-3.5 w-1/3 rounded" />
+            <ShimmerBase className="h-10 w-full rounded-xl" />
           </div>
         ))}
       </div>
-      <ShimmerBase className="h-10 w-full rounded" />
+      <div className="flex justify-end">
+        <ShimmerBase className="h-10 w-32 rounded-xl" />
+      </div>
     </div>
   );
 }
@@ -137,16 +139,18 @@ export function ShimmerDashboard() {
       {/* Summary cards */}
       <ShimmerSummaryCards />
 
-      {/* Charts row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ShimmerChart />
-        <ShimmerChart />
-      </div>
+      {/* Copilot skeleton */}
+      <ShimmerCard />
 
-      {/* Tables/Lists row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ShimmerTable rows={4} columns={3} />
-        <ShimmerTable rows={4} columns={3} />
+      {/* Main split */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 space-y-6">
+          <ShimmerExpenseForm />
+          <ShimmerTable rows={5} columns={4} />
+        </div>
+        <div>
+          <ShimmerCard />
+        </div>
       </div>
     </div>
   );
@@ -157,7 +161,7 @@ export function ShimmerBudgetManager() {
   return (
     <div className="space-y-4">
       {[...Array(3)].map((_, i) => (
-        <div key={i} className="bg-white rounded-lg p-4 space-y-3">
+        <div key={i} className="premium-card p-4 space-y-3">
           <ShimmerBase className="h-4 w-1/3 rounded" />
           <ShimmerBase className="h-3 w-full rounded-full" />
           <div className="flex justify-between">

@@ -194,84 +194,130 @@ function ExpenseForm({ refresh, isLoading = false }) {
     }
   };
 
-  if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
-  }
-
   return (
-    <div className="premium-card p-7 mb-5">
-      <iv className="mb-4">
-        <button
-          onClick={listening ? stopListening : startListening}
-          className="mr-2 rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-2 text-black"
-        >
-          {listening ? "Stop Listening" : "🎤 Voice Input"}
-        </button>
-        <button
-          onClick={processVoice}
-          className="mr-2 rounded-full border border-white/10 bg-[#1b1b1b] px-4 py-2 text-white"
-        >
-          Process Voice
-        </button>
-        <button
-          onClick={resetTranscript}
-          className="rounded-full bg-gray-800 px-4 py-2 text-white"
-        >
-          Reset
-        </button>
-      </iv>
-
-      <div className="mb-4">
-        <p className="text-gray-300">Transcript: {transcript}</p>
+    <div className="premium-card p-4 sm:p-6 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <h3 className="text-lg font-bold" style={{ color: "var(--text-heading)" }}>
+          ➕ Log New Expense
+        </h3>
+        {browserSupportsSpeechRecognition && (
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={listening ? stopListening : startListening}
+              className="rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-black hover:brightness-110 transition"
+            >
+              {listening ? "⏹️ Stop Listening" : "🎤 Voice Input"}
+            </button>
+            {transcript && (
+              <>
+                <button
+                  type="button"
+                  onClick={processVoice}
+                  className="rounded-full border border-white/10 bg-[#1b1b1b] px-3.5 py-1.5 text-xs sm:text-sm text-white hover:bg-white/10 transition"
+                >
+                  ⚡ Process Voice
+                </button>
+                <button
+                  type="button"
+                  onClick={resetTranscript}
+                  className="rounded-full bg-gray-800 px-3 py-1.5 text-xs sm:text-sm text-gray-300 hover:text-white transition"
+                >
+                  Reset
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="mb-4 rounded-xl border border-white/10 bg-black/30 p-2 text-sm text-gray-300">
-        <p>{isOnline ? "Online" : "Offline mode enabled"}</p>
-        <p>
+      {browserSupportsSpeechRecognition && transcript && (
+        <div className="mb-4 p-3 rounded-xl bg-black/20 border border-white/10 text-xs sm:text-sm text-gray-300">
+          <span className="font-semibold text-white">Transcript:</span> {transcript}
+        </div>
+      )}
+
+      <div className="mb-4 rounded-xl border border-white/10 bg-black/20 p-3 text-xs sm:text-sm text-gray-300 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500" : "bg-amber-500"}`}></span>
+          <span>{isOnline ? "Online Mode" : "Offline Mode Enabled"}</span>
+        </div>
+        <div>
           {offlineCount > 0
-            ? `${offlineCount} pending expense(s) will sync when online.`
-            : "No pending expenses."}
-        </p>
+            ? `${offlineCount} pending expense(s) will sync automatically.`
+            : "All expenses synced."}
+        </div>
       </div>
 
-      <form onSubmit={submit}>
-        <input
-          placeholder="Title"
-          className="border border-gray-700 bg-[#1a1a1a] text-white p-4 mr-2 mb-4 rounded-md"
-          value={expense.title}
-          onChange={(e) => setExpense({ ...expense, title: e.target.value })}
-        />
+      <form onSubmit={submit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+              Title
+            </label>
+            <input
+              placeholder="e.g. Groceries"
+              className="w-full premium-input px-3.5 py-2.5 text-sm"
+              value={expense.title}
+              onChange={(e) => setExpense({ ...expense, title: e.target.value })}
+              required
+            />
+          </div>
 
-        <input
-          placeholder="Amount"
-          type="number"
-          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
-          value={expense.amount}
-          onChange={(e) => setExpense({ ...expense, amount: e.target.value })}
-        />
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+              Amount (₹)
+            </label>
+            <input
+              placeholder="0.00"
+              type="number"
+              step="0.01"
+              className="w-full premium-input px-3.5 py-2.5 text-sm"
+              value={expense.amount}
+              onChange={(e) => setExpense({ ...expense, amount: e.target.value })}
+              required
+            />
+          </div>
 
-        <select
-          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
-          value={expense.category}
-          onChange={(e) => setExpense({ ...expense, category: e.target.value })}
-        >
-          {categories.map((c) => (
-            <option key={c.id} value={c.name}>
-              {c.icon} {c.name}
-            </option>
-          ))}
-        </select>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+              Category
+            </label>
+            <select
+              className="w-full premium-input px-3.5 py-2.5 text-sm"
+              value={expense.category}
+              onChange={(e) => setExpense({ ...expense, category: e.target.value })}
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.icon} {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <input
-          type="date"
-          className="border border-gray-700 bg-[#1a1a1a] text-white p-2 mr-2 rounded-md"
-          value={expense.date}
-          onChange={(e) => setExpense({ ...expense, date: e.target.value })}
-        />
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+              Date
+            </label>
+            <input
+              type="date"
+              className="w-full premium-input px-3.5 py-2.5 text-sm"
+              value={expense.date}
+              onChange={(e) => setExpense({ ...expense, date: e.target.value })}
+              required
+            />
+          </div>
+        </div>
 
-        <button className="rounded-full bg-gradient-to-r from-[#c9a227] to-[#e2b84d] px-4 py-5 text-black">
-          Add Expense
-        </button>
+        <div className="flex justify-end pt-1">
+          <button
+            type="submit"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#c9a227] to-[#e2b84d] text-black font-semibold text-sm hover:brightness-110 shadow-[0_8px_20px_rgba(201,162,39,0.2)] transition duration-200"
+          >
+            + Add Expense
+          </button>
+        </div>
       </form>
     </div>
   );

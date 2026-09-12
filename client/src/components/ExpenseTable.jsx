@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
 import { generateExpensePDF } from "../utils/pdfGenerator";
 import { ShimmerTable } from "./Shimmer";
@@ -178,38 +178,65 @@ function ExpenseTable({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">Expenses</h2>
-        <div className="flex gap-2">
+    <div className="premium-card p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--text-heading)" }}>
+            Expenses
+          </h2>
+          <p className="text-xs sm:text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
+            Showing {filteredExpenses.length} of {expenses.length} transaction{expenses.length === 1 ? "" : "s"}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition duration-200"
+            className="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition duration-200"
+            style={{
+              backgroundColor: showFilters ? "var(--accent)" : "var(--bg-input)",
+              color: showFilters ? "#000" : "var(--text-primary)",
+              border: "1px solid var(--border)",
+            }}
           >
-            {showFilters ? "Hide" : "Show"} Filters
+            {showFilters ? "✕ Hide Filters" : "🔍 Filters"}
           </button>
           <div className="relative">
             <select
-              onChange={(e) => exportData(e.target.value)}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition duration-200"
+              onChange={(e) => {
+                if (e.target.value) {
+                  exportData(e.target.value);
+                  e.target.value = "";
+                }
+              }}
+              className="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition duration-200 cursor-pointer"
+              style={{
+                backgroundColor: "var(--bg-input)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border)",
+              }}
               defaultValue=""
             >
               <option value="" disabled>
-                Export
+                📥 Export
               </option>
-              <option value="pdf">📄 Export PDF</option>
-              <option value="csv">📊 Export CSV</option>
-              <option value="json">💾 Export JSON</option>
+              <option value="pdf">📄 PDF</option>
+              <option value="csv">📊 CSV</option>
+              <option value="json">💾 JSON</option>
             </select>
           </div>
         </div>
       </div>
 
+      {/* Filters Box */}
       {showFilters && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <div
+          className="mb-6 p-4 rounded-xl space-y-4"
+          style={{ backgroundColor: "var(--bg-input)", border: "1px solid var(--border)" }}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Search
               </label>
               <input
@@ -219,11 +246,11 @@ function ExpenseTable({
                 onChange={(e) =>
                   setFilters({ ...filters, search: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Category
               </label>
               <select
@@ -231,7 +258,7 @@ function ExpenseTable({
                 onChange={(e) =>
                   setFilters({ ...filters, category: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3 py-2 text-sm focus:outline-none"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -242,35 +269,37 @@ function ExpenseTable({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Min Amount
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+                Min Amount (₹)
               </label>
               <input
                 type="number"
                 step="0.01"
+                placeholder="0.00"
                 value={filters.minAmount}
                 onChange={(e) =>
                   setFilters({ ...filters, minAmount: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Max Amount
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+                Max Amount (₹)
               </label>
               <input
                 type="number"
                 step="0.01"
+                placeholder="0.00"
                 value={filters.maxAmount}
                 onChange={(e) =>
                   setFilters({ ...filters, maxAmount: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 Start Date
               </label>
               <input
@@ -279,11 +308,11 @@ function ExpenseTable({
                 onChange={(e) =>
                   setFilters({ ...filters, startDate: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3 py-2 text-sm focus:outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
                 End Date
               </label>
               <input
@@ -292,72 +321,147 @@ function ExpenseTable({
                 onChange={(e) =>
                   setFilters({ ...filters, endDate: e.target.value })
                 }
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full premium-input px-3 py-2 text-sm focus:outline-none"
               />
             </div>
           </div>
-          <button
-            onClick={clearFilters}
-            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-200"
-          >
-            Clear Filters
-          </button>
+          <div className="flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-500/10 transition duration-200"
+            >
+              Clear All Filters
+            </button>
+          </div>
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full bg-white shadow">
+      {/* Mobile Card View (<640px) */}
+      <div className="block sm:hidden space-y-3">
+        {filteredExpenses.map((e) => (
+          <div
+            key={e.id}
+            className="p-3.5 rounded-xl transition duration-200"
+            style={{
+              backgroundColor: "var(--bg-input)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <div className="flex justify-between items-start gap-2">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm truncate" style={{ color: "var(--text-heading)" }}>
+                  {e.title}
+                </p>
+                {e.notes && (
+                  <p className="text-xs mt-0.5 truncate" style={{ color: "var(--text-muted)" }}>
+                    {e.notes}
+                  </p>
+                )}
+              </div>
+              <p className="text-base font-bold shrink-0" style={{ color: "var(--accent)" }}>
+                ₹{Number(e.amount).toFixed(2)}
+              </p>
+            </div>
+            <div className="flex justify-between items-center mt-3 pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
+              <div className="flex items-center gap-2">
+                <span
+                  className="px-2 py-0.5 rounded-full text-xs font-medium"
+                  style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                >
+                  {e.category}
+                </span>
+                <span className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  {e.date}
+                </span>
+              </div>
+              <button
+                onClick={() => remove(e.id)}
+                className="text-xs font-semibold px-2 py-1 rounded text-red-500 hover:bg-red-500/10 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop / Tablet Table View (>=640px) */}
+      <div className="hidden sm:block overflow-x-auto rounded-xl" style={{ border: "1px solid var(--border)" }}>
+        <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-200">
+            <tr style={{ backgroundColor: "var(--bg-card)", borderBottom: "1px solid var(--border)" }}>
               <th
-                className="p-3 text-left cursor-pointer hover:bg-gray-300"
+                className="p-3.5 text-left cursor-pointer transition select-none"
                 onClick={() => handleSort("title")}
+                style={{ color: "var(--text-heading)" }}
               >
                 Title {getSortIcon("title")}
               </th>
               <th
-                className="p-3 text-left cursor-pointer hover:bg-gray-300"
+                className="p-3.5 text-left cursor-pointer transition select-none"
                 onClick={() => handleSort("amount")}
+                style={{ color: "var(--text-heading)" }}
               >
                 Amount {getSortIcon("amount")}
               </th>
               <th
-                className="p-3 text-left cursor-pointer hover:bg-gray-300"
+                className="p-3.5 text-left cursor-pointer transition select-none"
                 onClick={() => handleSort("category")}
+                style={{ color: "var(--text-heading)" }}
               >
                 Category {getSortIcon("category")}
               </th>
               <th
-                className="p-3 text-left cursor-pointer hover:bg-gray-300"
+                className="p-3.5 text-left cursor-pointer transition select-none"
                 onClick={() => handleSort("date")}
+                style={{ color: "var(--text-heading)" }}
               >
                 Date {getSortIcon("date")}
               </th>
-              <th className="p-3">Actions</th>
+              <th className="p-3.5 text-right" style={{ color: "var(--text-heading)" }}>
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredExpenses.map((e) => (
-              <tr key={e.id} className="border-t hover:bg-gray-50">
-                <td className="p-3">
+              <tr
+                key={e.id}
+                className="transition duration-150"
+                style={{ borderBottom: "1px solid var(--border)" }}
+                onMouseEnter={ev => ev.currentTarget.style.backgroundColor = "var(--bg-card-hover)"}
+                onMouseLeave={ev => ev.currentTarget.style.backgroundColor = "transparent"}
+              >
+                <td className="p-3.5">
                   <div>
-                    <div className="font-medium text-gray-800">{e.title}</div>
+                    <div className="font-semibold" style={{ color: "var(--text-heading)" }}>
+                      {e.title}
+                    </div>
                     {e.notes && (
-                      <div className="text-sm text-gray-500">{e.notes}</div>
+                      <div className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                        {e.notes}
+                      </div>
                     )}
                   </div>
                 </td>
-                <td className="p-3 font-medium text-green-600">${e.amount}</td>
-                <td className="p-3">
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                <td className="p-3.5 font-bold" style={{ color: "var(--accent)" }}>
+                  ₹{Number(e.amount).toFixed(2)}
+                </td>
+                <td className="p-3.5">
+                  <span
+                    className="px-2.5 py-1 rounded-full text-xs font-semibold"
+                    style={{ backgroundColor: "var(--accent-soft)", color: "var(--accent)" }}
+                  >
                     {e.category}
                   </span>
                 </td>
-                <td className="p-3 text-gray-600">{e.date}</td>
-                <td className="p-3">
+                <td className="p-3.5 text-xs" style={{ color: "var(--text-muted)" }}>
+                  {e.date}
+                </td>
+                <td className="p-3.5 text-right">
                   <button
                     onClick={() => remove(e.id)}
-                    className="text-red-500 hover:text-red-700 font-medium"
+                    className="px-2.5 py-1 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-500/10 transition"
                   >
                     Delete
                   </button>
@@ -369,14 +473,12 @@ function ExpenseTable({
       </div>
 
       {filteredExpenses.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
-          No expenses found matching your criteria.
+        <div className="text-center py-10" style={{ color: "var(--text-muted)" }}>
+          <p className="text-3xl mb-2">🔍</p>
+          <p className="font-medium">No expenses found</p>
+          <p className="text-xs mt-1">Try adjusting your search or filters.</p>
         </div>
       )}
-
-      <div className="mt-4 text-sm text-gray-600">
-        Showing {filteredExpenses.length} of {expenses.length} expenses
-      </div>
     </div>
   );
 }

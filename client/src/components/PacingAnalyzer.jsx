@@ -80,7 +80,7 @@ function CircleRing({
 function Card({ children, className = "" }) {
   return (
     <div
-      className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-white/60 p-6 ${className}`}
+      className={`premium-card p-4 sm:p-6 ${className}`}
     >
       {children}
     </div>
@@ -722,26 +722,34 @@ function PacingAnalyzer({ expenses, isLoading = false }) {
   return (
     <div className="space-y-6">
       {/* ─── Header ─── */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-bold" style={{ color: "var(--text-heading)" }}>
             ⚖️ Decision Engine & Pacing Monitor
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Real-time spending feasibility analysis based on your live budget
-            data.
+          <p className="text-xs sm:text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
+            Real-time spending feasibility analysis based on your live budget data.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 font-medium transition border border-purple-200 px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100"
+            className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition"
+            style={{
+              backgroundColor: "var(--bg-input)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border)",
+            }}
           >
             📜 History ({history.length})
           </button>
           <button
             onClick={loadData}
-            className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition"
+            className="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition hover:brightness-110"
+            style={{
+              background: "linear-gradient(to right, #c9a227, #e2b84d)",
+              color: "#000",
+            }}
           >
             🔄 Refresh Data
           </button>
