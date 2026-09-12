@@ -28,10 +28,10 @@ export function ShimmerCard() {
 }
 
 // Summary cards row (for dashboard top cards)
-export function ShimmerSummaryCards() {
+export function ShimmerSummaryCards({ count = 4 }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-      {[...Array(3)].map((_, i) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      {[...Array(count)].map((_, i) => (
         <div key={i} className="premium-card p-4 sm:p-5 space-y-3">
           <ShimmerBase className="h-4 w-1/2 rounded" />
           <ShimmerBase className="h-7 w-2/3 rounded" />

@@ -16,10 +16,12 @@ import BudgetManager from "../components/budgets/BudgetManager";
 import RecurringExpenseManager from "../components/expenses/RecurringExpenseManager";
 import PacingAnalyzer from "../components/analytics/PacingAnalyzer";
 import AIFinancialCopilot from "../components/analytics/AIFinancialCopilot";
+import IncomeManager from "../components/income/IncomeManager";
 import { ShimmerDashboard } from "../components/shared/Shimmer";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
+  const [incomes, setIncomes] = useState([]);
   const [activeTab, setActiveTab] = useState("expenses");
   const [budgetProgress, setBudgetProgress] = useState([]);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -33,6 +35,15 @@ function Dashboard() {
     logout();
     navigate("/");
   };
+
+  const loadIncomes = useCallback(async () => {
+    try {
+      const res = await API.get("/incomes");
+      setIncomes(res.data);
+    } catch (error) {
+      console.error("Error loading incomes:", error);
+    }
+  }, []);
 
   const loadBudgetProgress = useCallback(async () => {
     try {
@@ -61,10 +72,12 @@ function Dashboard() {
 
   useEffect(() => {
     loadExpenses(true);
-  }, [loadExpenses]);
+    loadIncomes();
+  }, [loadExpenses, loadIncomes]);
 
   const tabs = [
     { id: "expenses", label: "Expenses", icon: "💰" },
+    { id: "income", label: "Income", icon: "💵" },
     { id: "categories", label: "Categories", icon: "🏷️" },
     { id: "budgets", label: "Budgets", icon: "📊" },
     { id: "recurring", label: "Recurring", icon: "🔄" },
@@ -81,7 +94,7 @@ function Dashboard() {
       case "expenses":
         return (
           <div className="space-y-6">
-            <SummaryCards expenses={expenses} isLoading={isLoading} />
+            <SummaryCards expenses={expenses} incomes={incomes} isLoading={isLoading} />
             <AIFinancialCopilot
               expenses={expenses}
               budgetProgress={budgetProgress}
@@ -152,6 +165,8 @@ function Dashboard() {
             </div>
           </div>
         );
+      case "income":
+        return <IncomeManager incomes={incomes} refresh={loadIncomes} />;
       case "categories":
         return <CategoryManager />;
       case "budgets":

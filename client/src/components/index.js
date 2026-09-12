@@ -4,6 +4,9 @@ export { default as ExpenseTable } from "./expenses/ExpenseTable";
 export { default as CategoryManager } from "./expenses/CategoryManager";
 export { default as RecurringExpenseManager } from "./expenses/RecurringExpenseManager";
 
+// Income
+export { default as IncomeManager } from "./income/IncomeManager";
+
 // Budgets
 export { default as BudgetManager } from "./budgets/BudgetManager";
 

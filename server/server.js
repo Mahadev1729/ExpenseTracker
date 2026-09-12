@@ -8,10 +8,13 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
 const recurringExpenseRoutes = require("./routes/recurringExpenseRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const incomeRoutes = require("./routes/incomeRoutes");
 const notificationModel = require("./models/notificationModel");
+const incomeModel = require("./models/incomeModel");
 
-// Auto-initialize Notifications Table
+// Auto-initialize Notifications & Incomes Tables
 notificationModel.initialize();
+incomeModel.initialize();
 
 const app = express();
 
@@ -49,6 +52,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/recurring-expenses", recurringExpenseRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/incomes", incomeRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "Expense Tracker API is running" });
