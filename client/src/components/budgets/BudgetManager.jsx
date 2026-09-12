@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
-import { ShimmerBudgetManager } from "./Shimmer";
+import API from "../../services/api";
+import { ShimmerBudgetManager } from "../shared/Shimmer";
 
 function BudgetManager() {
   const [budgets, setBudgets] = useState([]);

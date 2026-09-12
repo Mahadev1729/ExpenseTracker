@@ -1,6 +1,6 @@
-﻿import { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/context";
+import { AuthContext } from "../../context/context";
 
 function ProtectedRoute({ children }) {
   const { user } = useContext(AuthContext);

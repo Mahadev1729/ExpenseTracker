@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from "react";
-import API from "../services/api";
-import { NotificationContext } from "../context/NotificationContext";
-import { ShimmerChart } from "./Shimmer";
+import API from "../../services/api";
+import { NotificationContext } from "../../context/NotificationContext";
+import { ShimmerChart } from "../shared/Shimmer";
 
 /* ─────────────────────────────────────────────
    HELPER UTILITIES

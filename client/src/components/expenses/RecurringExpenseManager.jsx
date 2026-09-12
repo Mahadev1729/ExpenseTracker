@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
-import { ShimmerList } from "./Shimmer";
+import API from "../../services/api";
+import { ShimmerList } from "../shared/Shimmer";
 
 function RecurringExpenseManager() {
   const [recurringExpenses, setRecurringExpenses] = useState([]);

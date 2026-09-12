@@ -1,4 +1,4 @@
-import { ShimmerSummaryCards } from "./Shimmer";
+import { ShimmerSummaryCards } from "../shared/Shimmer";
 
 function SummaryCards({ expenses, isLoading = false }) {
   if (isLoading) {

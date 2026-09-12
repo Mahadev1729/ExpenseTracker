@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
-import { generateExpensePDF } from "../utils/pdfGenerator";
-import { ShimmerTable } from "./Shimmer";
+import API from "../../services/api";
+import { generateExpensePDF } from "../../utils/pdfGenerator";
+import { ShimmerTable } from "../shared/Shimmer";
 
 function ExpenseTable({
   expenses: initialExpenses,

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import API from "../services/api";
-import { ShimmerList } from "./Shimmer";
+import API from "../../services/api";
+import { ShimmerList } from "../shared/Shimmer";
 
 function CategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -14,18 +14,18 @@ function CategoryManager() {
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
-    fetchCategories();
+    fetchCategories(true);
   }, []);
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (isInitial = false) => {
     try {
-      setIsLoading(true);
+      if (isInitial) setIsLoading(true);
       const response = await API.get("/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     } finally {
-      setIsLoading(false);
+      if (isInitial) setIsLoading(false);
     }
   };
 

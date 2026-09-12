@@ -11,8 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import API from "../services/api";
-import { ShimmerChart } from "./Shimmer";
+import API from "../../services/api";
+import { ShimmerChart } from "../shared/Shimmer";
 
 ChartJS.register(
   BarElement,

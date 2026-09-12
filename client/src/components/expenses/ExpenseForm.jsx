@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback, useContext } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-import API from "../services/api";
+import API from "../../services/api";
 import {
   getPendingCount,
   savePendingExpense,
   clearPendingExpenses,
   getPendingExpenses,
-} from "../utils/offlineStorage";
-import { ShimmerExpenseForm } from "./Shimmer";
-import { NotificationContext } from "../context/NotificationContext";
+} from "../../utils/offlineStorage";
+import { ShimmerExpenseForm } from "../shared/Shimmer";
+import { NotificationContext } from "../../context/NotificationContext";
 
 function ExpenseForm({ refresh, isLoading = false }) {
   if (isLoading) {

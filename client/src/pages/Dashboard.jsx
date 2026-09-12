@@ -4,19 +4,19 @@ import API from "../services/api";
 import { NotificationContext } from "../context/NotificationContext";
 import { AuthContext } from "../context/context";
 import { useTheme } from "../context/ThemeContext";
-import NotificationInbox from "../components/NotificationInbox";
-import PWAInstallPrompt from "../components/PWAInstallPrompt";
+import NotificationInbox from "../components/shared/NotificationInbox";
+import PWAInstallPrompt from "../components/shared/PWAInstallPrompt";
 
-import ExpenseForm from "../components/ExpenseForm";
-import ExpenseTable from "../components/ExpenseTable";
-import DashboardCharts from "../components/DashboardCharts";
-import SummaryCards from "../components/SummaryCards";
-import CategoryManager from "../components/CategoryManager";
-import BudgetManager from "../components/BudgetManager";
-import RecurringExpenseManager from "../components/RecurringExpenseManager";
-import PacingAnalyzer from "../components/PacingAnalyzer";
-import AIFinancialCopilot from "../components/AIFinancialCopilot";
-import { ShimmerDashboard } from "../components/Shimmer";
+import ExpenseForm from "../components/expenses/ExpenseForm";
+import ExpenseTable from "../components/expenses/ExpenseTable";
+import DashboardCharts from "../components/analytics/DashboardCharts";
+import SummaryCards from "../components/analytics/SummaryCards";
+import CategoryManager from "../components/expenses/CategoryManager";
+import BudgetManager from "../components/budgets/BudgetManager";
+import RecurringExpenseManager from "../components/expenses/RecurringExpenseManager";
+import PacingAnalyzer from "../components/analytics/PacingAnalyzer";
+import AIFinancialCopilot from "../components/analytics/AIFinancialCopilot";
+import { ShimmerDashboard } from "../components/shared/Shimmer";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
@@ -43,9 +43,9 @@ function Dashboard() {
     }
   }, []);
 
-  const loadExpenses = useCallback(async () => {
+  const loadExpenses = useCallback(async (isInitial = false) => {
     try {
-      setIsLoading(true);
+      if (isInitial) setIsLoading(true);
       const res = await API.get("/expenses");
       setExpenses(res.data);
       loadBudgetProgress();
@@ -55,12 +55,12 @@ function Dashboard() {
     } catch (error) {
       console.error("Error loading expenses:", error);
     } finally {
-      setIsLoading(false);
+      if (isInitial) setIsLoading(false);
     }
   }, [refreshNotifications, loadBudgetProgress]);
 
   useEffect(() => {
-    loadExpenses();
+    loadExpenses(true);
   }, [loadExpenses]);
 
   const tabs = [

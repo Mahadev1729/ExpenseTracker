@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/context";
+import { AuthContext } from "../../context/context";
 import NotificationInbox from "./NotificationInbox";
 
 function Navbar() {

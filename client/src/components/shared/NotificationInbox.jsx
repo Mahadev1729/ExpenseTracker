@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect, useRef } from "react";
-import { NotificationContext } from "../context/NotificationContext";
+import { NotificationContext } from "../../context/NotificationContext";
 
 function NotificationInbox() {
   const {

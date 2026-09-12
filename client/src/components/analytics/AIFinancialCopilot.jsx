@@ -1,4 +1,4 @@
-﻿import { ShimmerCard } from "./Shimmer";
+import { ShimmerCard } from "../shared/Shimmer";
 
 function AIFinancialCopilot({
   expenses = [],
