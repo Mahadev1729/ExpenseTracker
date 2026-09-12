@@ -53,7 +53,17 @@ exports.getBudgetProgress = async (userId, categoryId = null) => {
         LEFT JOIN categories c ON b.category_id = c.id
         LEFT JOIN expenses e ON e.user_id = b.user_id
         AND (b.category_id IS NULL OR e.category = c.name)
-        AND e.date BETWEEN b.start_date AND b.end_date
+        AND e.date >= b.start_date
+        AND (
+            (b.end_date IS NOT NULL AND e.date <= b.end_date)
+            OR (b.end_date IS NULL AND (
+                (b.period = 'weekly' AND e.date < DATE_ADD(b.start_date, INTERVAL 1 WEEK))
+                OR (b.period = 'monthly' AND e.date < DATE_ADD(b.start_date, INTERVAL 1 MONTH))
+                OR (b.period = 'quarterly' AND e.date < DATE_ADD(b.start_date, INTERVAL 3 MONTH))
+                OR (b.period = 'yearly' AND e.date < DATE_ADD(b.start_date, INTERVAL 1 YEAR))
+                OR b.period IS NULL OR b.period = ''
+            ))
+        )
         WHERE b.user_id = ?
     `;
 
