@@ -1,4 +1,4 @@
-const incomeModel = require("../models/incomeModel");
+const incomeModel = require("./incomeModel");
 
 exports.getIncomes = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
-const notificationModel = require("../models/notificationModel");
-const budgetModel = require("../models/budgetModel");
-const recurringExpenseModel = require("../models/recurringExpenseModel");
+const notificationModel = require("./notificationModel");
+const budgetModel = require("../budgets/budgetModel");
+const recurringExpenseModel = require("../recurring/recurringExpenseModel");
 
 exports.getNotifications = async (req, res) => {
     try {

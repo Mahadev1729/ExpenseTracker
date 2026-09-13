@@ -2,15 +2,15 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const authRoutes = require("./routes/authRoutes");
-const expenseRoutes = require("./routes/expenseRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
-const budgetRoutes = require("./routes/budgetRoutes");
-const recurringExpenseRoutes = require("./routes/recurringExpenseRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
-const incomeRoutes = require("./routes/incomeRoutes");
-const notificationModel = require("./models/notificationModel");
-const incomeModel = require("./models/incomeModel");
+const authRoutes = require("./features/auth/authRoutes");
+const expenseRoutes = require("./features/expenses/expenseRoutes");
+const categoryRoutes = require("./features/categories/categoryRoutes");
+const budgetRoutes = require("./features/budgets/budgetRoutes");
+const recurringExpenseRoutes = require("./features/recurring/recurringExpenseRoutes");
+const notificationRoutes = require("./features/notifications/notificationRoutes");
+const incomeRoutes = require("./features/incomes/incomeRoutes");
+const notificationModel = require("./features/notifications/notificationModel");
+const incomeModel = require("./features/incomes/incomeModel");
 
 // Auto-initialize Notifications & Incomes Tables
 notificationModel.initialize();
