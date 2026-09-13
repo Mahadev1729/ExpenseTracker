@@ -27,16 +27,16 @@ export const NotificationProvider = ({ children }) => {
     if (!user) return;
     try {
       const res = await API.get("/notifications");
+      const data = Array.isArray(res.data) ? res.data : [];
       setNotifications((prev) => {
         const prevIds = new Set(prev.map((n) => n.id));
-        const newUnread = res.data.filter((n) => !n.is_read && !prevIds.has(n.id));
-        
+        const newUnread = data.filter((n) => !n.is_read && !prevIds.has(n.id));
         
         newUnread.forEach((n) => {
           addToast(n.title, n.message, n.type);
         });
 
-        return res.data;
+        return data;
       });
     } catch (err) {
       console.error("Error fetching notifications:", err);

@@ -12,9 +12,15 @@ const incomeRoutes = require("./features/incomes/incomeRoutes");
 const notificationModel = require("./features/notifications/notificationModel");
 const incomeModel = require("./features/incomes/incomeModel");
 
-// Auto-initialize Notifications & Incomes Tables
-notificationModel.initialize();
-incomeModel.initialize();
+// Auto-initialize Notifications & Incomes Tables safely
+(async () => {
+  try {
+    await notificationModel.initialize();
+    await incomeModel.initialize();
+  } catch (err) {
+    console.error("Startup table verification error:", err.message);
+  }
+})();
 
 const app = express();
 

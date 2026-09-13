@@ -13,22 +13,61 @@ exports.initialize = async () => {
                 date DATE NOT NULL,
                 notes TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_incomes_user_id (user_id),
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
         `);
         console.log("Incomes table verified/created.");
     } catch (err) {
-        console.error("Failed to initialize incomes table:", err);
+        console.warn("Retrying incomes table creation without FK constraint...", err.message);
+        try {
+            const connection = await db;
+            await connection.execute(`
+                CREATE TABLE IF NOT EXISTS incomes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    source VARCHAR(255) NOT NULL,
+                    amount DECIMAL(10, 2) NOT NULL,
+                    category VARCHAR(100) NOT NULL DEFAULT 'Salary',
+                    date DATE NOT NULL,
+                    notes TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_incomes_user_id (user_id)
+                )
+            `);
+            console.log("Incomes table verified/created (without FK constraint).");
+        } catch (retryErr) {
+            console.error("Failed to initialize incomes table:", retryErr);
+        }
     }
 };
 
 exports.getIncomesByUser = async (userId) => {
-    const connection = await db;
-    const [rows] = await connection.execute(
-        "SELECT * FROM incomes WHERE user_id = ? ORDER BY date DESC, id DESC",
-        [userId]
-    );
-    return rows;
+    try {
+        const connection = await db;
+        const [rows] = await connection.execute(
+            "SELECT * FROM incomes WHERE user_id = ? ORDER BY date DESC, id DESC",
+            [userId]
+        );
+        return rows;
+    } catch (err) {
+        if (err.code === "ER_NO_SUCH_TABLE") {
+            console.warn("Incomes table missing, auto-initializing...");
+            await exports.initialize();
+            try {
+                const connection = await db;
+                const [rows] = await connection.execute(
+                    "SELECT * FROM incomes WHERE user_id = ? ORDER BY date DESC, id DESC",
+                    [userId]
+                );
+                return rows;
+            } catch (retryErr) {
+                console.error("Failed to query incomes after init:", retryErr);
+                return [];
+            }
+        }
+        throw err;
+    }
 };
 
 exports.addIncome = async (incomeData) => {
