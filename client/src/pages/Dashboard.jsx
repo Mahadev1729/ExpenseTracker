@@ -17,11 +17,13 @@ import RecurringExpenseManager from "../components/expenses/RecurringExpenseMana
 import PacingAnalyzer from "../components/analytics/PacingAnalyzer";
 import AIFinancialCopilot from "../components/analytics/AIFinancialCopilot";
 import IncomeManager from "../components/income/IncomeManager";
+import ReportsManager from "../components/reports/ReportsManager";
 import { ShimmerDashboard } from "../components/shared/Shimmer";
 
 function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState("expenses");
   const [budgetProgress, setBudgetProgress] = useState([]);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -54,6 +56,15 @@ function Dashboard() {
     }
   }, []);
 
+  const loadCategories = useCallback(async () => {
+    try {
+      const res = await API.get("/categories");
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Error loading categories:", error);
+    }
+  }, []);
+
   const loadExpenses = useCallback(async (isInitial = false) => {
     try {
       if (isInitial) setIsLoading(true);
@@ -73,7 +84,8 @@ function Dashboard() {
   useEffect(() => {
     loadExpenses(true);
     loadIncomes();
-  }, [loadExpenses, loadIncomes]);
+    loadCategories();
+  }, [loadExpenses, loadIncomes, loadCategories]);
 
   const tabs = [
     { id: "expenses", label: "Expenses", icon: "💰" },
@@ -82,6 +94,7 @@ function Dashboard() {
     { id: "budgets", label: "Budgets", icon: "📊" },
     { id: "recurring", label: "Recurring", icon: "🔄" },
     { id: "analytics", label: "Analytics", icon: "📈" },
+    { id: "reports", label: "Reports & Export", icon: "📑" },
     { id: "decision", label: "Decision Engine", icon: "⚖️" },
   ];
 
@@ -175,6 +188,16 @@ function Dashboard() {
         return <RecurringExpenseManager />;
       case "analytics":
         return <DashboardCharts expenses={expenses} isLoading={isLoading} />;
+      case "reports":
+        return (
+          <ReportsManager
+            expenses={expenses}
+            incomes={incomes}
+            budgets={budgetProgress}
+            categories={categories}
+            user={user}
+          />
+        );
       case "decision":
         return <PacingAnalyzer expenses={expenses} isLoading={isLoading} />;
       default:

@@ -16,6 +16,9 @@ export { default as DashboardCharts } from "./analytics/DashboardCharts";
 export { default as PacingAnalyzer } from "./analytics/PacingAnalyzer";
 export { default as AIFinancialCopilot } from "./analytics/AIFinancialCopilot";
 
+// Reports & Export
+export { default as ReportsManager } from "./reports/ReportsManager";
+
 // Shared / UI
 export { default as Navbar } from "./shared/Navbar";
 export { default as ToastAlerts } from "./shared/ToastAlerts";

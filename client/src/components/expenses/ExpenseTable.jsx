@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import API from "../../services/api";
 import { generateExpensePDF } from "../../utils/pdfGenerator";
+import { exportToCSV, exportToJSON } from "../../utils/reportGenerator";
 import { ShimmerTable } from "../shared/Shimmer";
 import { formatCategoryLabel } from "../../utils/categoryIcons";
 
@@ -114,41 +115,32 @@ function ExpenseTable({
     setSortConfig({ key, direction });
   };
 
-  const exportData = async (format) => {
+  const exportData = (format) => {
     try {
       if (format === "pdf") {
         generateExpensePDF(filteredExpenses, categories);
         return;
       }
 
-      const response = await API.get(
-        `/expenses/export?format=${format}&${new URLSearchParams(filters).toString()}`,
-        {
-          responseType: format === "json" ? "json" : "blob",
-        },
-      );
+      if (format === "csv") {
+        exportToCSV({
+          expenses: filteredExpenses,
+          mode: "expenses",
+          filename: `expenses_${new Date().toISOString().split("T")[0]}.csv`,
+        });
+        return;
+      }
 
       if (format === "json") {
-        const dataStr = JSON.stringify(response.data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: "application/json" });
-        downloadBlob(dataBlob, "expenses.json");
-      } else {
-        downloadBlob(response.data, "expenses.csv");
+        exportToJSON({
+          data: filteredExpenses,
+          filename: `expenses_${new Date().toISOString().split("T")[0]}.json`,
+        });
+        return;
       }
     } catch (error) {
       console.error("Error exporting data:", error);
     }
-  };
-
-  const downloadBlob = (blob, filename) => {
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
   };
 
   const remove = async (id) => {
